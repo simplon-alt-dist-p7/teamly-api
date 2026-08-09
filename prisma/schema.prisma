@@ -28,12 +28,13 @@ enum LeaveStatus {
 }
 
 model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  password  String
-  role      Role
-  employee  Employee?
-  createdAt DateTime  @default(now())
+  id               String       @id @default(uuid())
+  email            String       @unique
+  password         String
+  role             Role
+  employee         Employee?
+  createdAt        DateTime     @default(now())
+  ownedRestaurants Restaurant[]
 }
 
 model Employee {
@@ -44,6 +45,8 @@ model Employee {
   lastName      String
   shifts        Shift[]
   leaveRequests LeaveRequest[]
+  restaurantId  String
+  restaurant    Restaurant     @relation(fields: [restaurantId], references: [id])
 }
 
 model Shift {
@@ -61,4 +64,14 @@ model LeaveRequest {
   startDate  DateTime
   endDate    DateTime
   status     LeaveStatus @default(PENDING)
+}
+
+model Restaurant {
+  id        String     @id @default(uuid())
+  name      String
+  employees Employee[]
+  ownerId   String
+  owner     User       @relation(fields: [ownerId], references: [id])
+  // éventuellement owners via UserRestaurant / Membership
+  createdAt DateTime   @default(now())
 }
