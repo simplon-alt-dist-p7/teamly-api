@@ -1,38 +1,50 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { PrismaService } from 'prisma/prisma.service';
+import { RestaurantsInMemoryRepository } from '../../data-access/adapters/restaurants-in-memory.repository';
+import { RESTAURANTS_REPOSITORY } from '../../data-access/restaurants.repository';
 import { RestaurantService } from '../../restaurant.service';
+import { RestaurantDataAccessUnitTestModule } from '../utils/restaurant-data-access-unit.test-module';
 
 describe('RestaurantService', () => {
   let service: RestaurantService;
+  let repo: RestaurantsInMemoryRepository;
 
-  const prismaMock = {
-    restaurant: {
-      create: jest.fn(),
-    },
+  const validRestaurantData = {
+    name: 'Le Bistrot',
+    address: '10 rue de Paris, 75001 Paris',
+    phone: '+33612345678',
+    email: 'contact@lebistrot.fr',
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        RestaurantService,
-        { provide: PrismaService, useValue: prismaMock },
-      ],
+      imports: [RestaurantDataAccessUnitTestModule],
+      providers: [RestaurantService],
     }).compile();
 
-    service = module.get<RestaurantService>(RestaurantService);
-    jest.clearAllMocks();
-  });
-
-  it('should be defined', () => {
-    expect(service).toBeDefined();
+    service = module.get(RestaurantService);
+    repo = module.get(RESTAURANTS_REPOSITORY);
+    repo.restaurants = [];
   });
 
   it('should throw BadRequestException if name is missing', async () => {
     await expect(
-      service.createRestaurant({ name: '' }, 'owner-1'),
+      service.createRestaurant({ ...validRestaurantData, name: '' }, 'owner-1'),
     ).rejects.toThrow(BadRequestException);
 
-    expect(prismaMock.restaurant.create).not.toHaveBeenCalled();
+    expect(repo.restaurants).toHaveLength(0);
+  });
+  it('should create and persist a restaurant', async () => {
+    const result = await service.createRestaurant(
+      validRestaurantData,
+      'owner-1',
+    );
+
+    expect(repo.restaurants).toHaveLength(1);
+    expect(result.name).toBe(validRestaurantData.name);
+    expect(result.address).toBe(validRestaurantData.address);
+    expect(result.phone).toBe(validRestaurantData.phone);
+    expect(result.email).toBe(validRestaurantData.email);
+    expect(result.ownerId).toBe('owner-1');
   });
 });

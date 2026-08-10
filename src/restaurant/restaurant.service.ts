@@ -1,10 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Restaurant } from '@prisma/client';
-import { PrismaService } from 'prisma/prisma.service';
+import type { RestaurantsRepository } from './data-access/restaurants.repository';
+import { RESTAURANTS_REPOSITORY } from './data-access/restaurants.repository';
 import { CreateRestaurantRequest } from './dtos/request/create-restaurant-dto';
 @Injectable()
 export class RestaurantService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(RESTAURANTS_REPOSITORY)
+    private readonly restaurantsRepository: RestaurantsRepository,
+  ) {}
 
   async createRestaurant(
     data: CreateRestaurantRequest,
@@ -12,14 +16,9 @@ export class RestaurantService {
   ): Promise<Restaurant> {
     const { name } = data;
     if (!name) {
-      throw new BadRequestException('name is mandatory');
+      throw new BadRequestException('name is mandatatory');
     }
 
-    return await this.prisma.restaurant.create({
-      data: {
-        name,
-        ownerId,
-      },
-    });
+    return this.restaurantsRepository.create(data, ownerId);
   }
 }

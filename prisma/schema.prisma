@@ -69,6 +69,9 @@ model LeaveRequest {
 model Restaurant {
   id        String     @id @default(uuid())
   name      String
+  address   String
+  phone     String
+  email     String
   employees Employee[]
   ownerId   String
   owner     User       @relation(fields: [ownerId], references: [id])

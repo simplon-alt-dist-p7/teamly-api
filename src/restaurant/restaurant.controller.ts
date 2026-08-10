@@ -5,7 +5,7 @@ import { CreateRestaurantRequest } from './dtos/request/create-restaurant-dto';
 import { RestaurantService } from './restaurant.service';
 @Controller('restaurant')
 export class RestaurantController {
-  constructor(private readonly restaurantService: RestaurantService) { }
+  constructor(private readonly restaurantService: RestaurantService) {}
 
   @UseGuards(AuthGuard)
   @Post()
