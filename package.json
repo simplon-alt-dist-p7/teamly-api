@@ -14,10 +14,16 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
+    "test:int:watch": "dotenv -e .env.test -- jest --testPathPatterns=integration --watch",
+    "db:test:up": "docker compose up -d",
+    "db:test:create": "docker compose exec -T postgres psql -U postgres -tc \"SELECT 1 FROM pg_database WHERE datname='teamly_test'\" | grep -q 1 || docker compose exec -T postgres psql -U postgres -c \"CREATE DATABASE teamly_test;\"",
+    "db:test:migrate": "dotenv -e .env.test -- prisma migrate deploy",
+    "db:test:setup": "npm run db:test:up && npm run db:test:create && npm run db:test:migrate",
+    "test:int": "npm run db:test:setup && dotenv -e .env.test -- jest --testPathPatterns=integration",
+    "test:e2e": "npm run db:test:setup && dotenv -e .env.test -- jest --config ./test/jest-e2e.json",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "dotenv -e .env.test -- jest --config ./test/jest-e2e.json"
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -76,6 +82,10 @@
       "<rootDir>/.."
     ],
     "testRegex": ".*\\.spec\\.ts$",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "\\.integration\\.spec\\.ts$"
+    ],
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
