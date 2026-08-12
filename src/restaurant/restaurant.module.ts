@@ -12,5 +12,6 @@ import { RestaurantService } from './restaurant.service';
     RestaurantService,
     { provide: RESTAURANTS_REPOSITORY, useClass: RestaurantsPrismaRepository },
   ],
+  exports: [RESTAURANTS_REPOSITORY],
 })
 export class RestaurantModule {}

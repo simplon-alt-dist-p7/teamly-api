@@ -1,98 +1,115 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# teamly-api
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API NestJS pour Teamly (auth, restaurants, employés).
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Prérequis
 
-## Description
+- Node.js (LTS)
+- Docker + Docker Compose
+- npm
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Configuration / setup
 
-## Project setup
+1. Installer les dépendances :
 
 ```bash
-$ npm install
+npm install
 ```
 
-## Compile and run the project
+2. Variables d'environnement
+
+- Dev : créer un fichier `.env` (non versionné) :
+
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/teamly?schema=public
+```
+
+- Tests : fichier `.env.test` (ignoré par git) :
+
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/teamly_test?schema=public
+```
+
+3. Démarrer Postgres :
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+docker compose up -d
 ```
 
-## Run tests
+Le compose démarre Postgres et crée la base `teamly` (dev).  
+La base `teamly_test` est créée automatiquement par les scripts de test.
+
+4. Migrations (dev) :
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npx prisma migrate deploy
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+En local, tu peux aussi utiliser :
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npx prisma migrate dev
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+5. Lancer l'API :
 
-## Resources
+```bash
+npm run start:dev
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+Par défaut : `http://localhost:3000`
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Tests
 
-## Support
+### Unitaires
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+npm test
+```
 
-## Stay in touch
+Lance les fichiers `*.spec.ts` sous `src/` (sans setup DB automatique).
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Intégration
 
-## License
+Les tests d'intégration utilisent Postgres (`teamly_test`) via `.env.test`.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```bash
+npm run test:int
+```
+
+Ce script fait, dans l'ordre :
+
+1. `db:test:up` — démarre Docker Compose
+2. `db:test:create` — crée `teamly_test` si elle n'existe pas
+3. `db:test:migrate` — applique les migrations Prisma sur la DB test
+4. Lance Jest sur les fichiers matching `integration`
+
+En watch (si la DB test est déjà prête) :
+
+```bash
+npm run test:int:watch
+```
+
+### E2E
+
+```bash
+npm run test:e2e
+```
+
+Même setup DB que les tests d'intégration, puis Jest avec `test/jest-e2e.json`.
+
+### Scripts DB utiles
+
+| Script                    | Rôle                         |
+| ------------------------- | ---------------------------- |
+| `npm run db:test:up`      | Démarre Postgres             |
+| `npm run db:test:create`  | Crée `teamly_test` si besoin |
+| `npm run db:test:migrate` | Migre la DB test             |
+| `npm run db:test:setup`   | up + create + migrate        |
+
+## Flux typique
+
+1. `docker compose up -d`
+2. Configurer `.env` et `.env.test`
+3. `npm run start:dev` pour développer
+4. `npm run test:int` pour valider service + DB
