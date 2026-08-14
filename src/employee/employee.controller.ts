@@ -1,4 +1,12 @@
-import { Body, Controller, Param, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import type { AuthenticatedRequest } from 'src/auth/auth.guard';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { CreateEmployeeRequest } from './dtos/request/create-employee-dto';
@@ -16,5 +24,18 @@ export class EmployeeController {
   ) {
     // req.user.sub = id du OWNER
     return this.employeeService.createEmployee(restaurantId, dto, req.user.sub);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get()
+  get(
+    @Req() req: AuthenticatedRequest,
+    @Param('restaurantId') restaurantId: string,
+  ) {
+    // req.user.sub = id du OWNER
+    return this.employeeService.getEmployeesByRestaurant(
+      restaurantId,
+      req.user.sub,
+    );
   }
 }
