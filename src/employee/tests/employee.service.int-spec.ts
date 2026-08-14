@@ -202,4 +202,149 @@ describe('employee service ', () => {
 
     expect(await prisma.employee.findMany()).toHaveLength(0);
   });
+
+  describe('getEmployeeByRestaurant', () => {
+    const employeeDto = {
+      email: 'alice@test.com',
+      password: 'secret123',
+      firstName: 'Alice',
+      lastName: 'Martin',
+    };
+
+    it('should return all employees, given restaurantId', async () => {
+      const owner = await authService.createUser({
+        email: 'owner@test.com',
+        password: 'secret123',
+        role: Role.OWNER,
+      });
+
+      const ownerOther = await authService.createUser({
+        email: 'otherOwner@test.com',
+        password: 'secret123',
+        role: Role.OWNER,
+      });
+
+      const restaurant = await restaurants.create(
+        {
+          name: 'test',
+          email: 'test@mail.com',
+          address: '33 rue sadi carnot',
+          phone: '0767395015',
+        },
+        owner.id,
+      );
+
+      const otherRestaurant = await restaurants.create(
+        {
+          name: 'test',
+          email: 'otherTest@mail.com',
+          address: '33 rue sadi carnot',
+          phone: '0767395015',
+        },
+        ownerOther.id,
+      );
+
+      await service.createEmployee(
+        restaurant.id,
+        { ...employeeDto, email: 'employee1@mail.com' },
+        owner.id,
+      );
+
+      await service.createEmployee(
+        restaurant.id,
+        { ...employeeDto, email: 'employee2@mail.com' },
+        owner.id,
+      );
+
+      await service.createEmployee(
+        otherRestaurant.id,
+        employeeDto,
+        ownerOther.id,
+      );
+
+      const employeeFromRestaurant = await service.getEmployeesByRestaurant(
+        restaurant.id,
+        owner.id,
+      );
+
+      expect(
+        employeeFromRestaurant.every(
+          (employee) => employee.restaurantId === restaurant.id,
+        ),
+      );
+
+      expect(employeeFromRestaurant).toHaveLength(2);
+      expect(
+        employeeFromRestaurant.every((e) => e.restaurantId === restaurant.id),
+      ).toBe(true);
+    });
+
+    it('throws ForbiddenException when owner is not valid', async () => {
+      const owner = await authService.createUser({
+        email: 'owner@test.com',
+        password: 'secret123',
+        role: Role.OWNER,
+      });
+
+      const otherOwner = await authService.createUser({
+        email: 'otherOwner@test.com',
+        password: 'secret123',
+        role: Role.OWNER,
+      });
+
+      const restaurant = await restaurants.create(
+        {
+          name: 'test',
+          email: 'test@mail.com',
+          address: '33 rue sadi carnot',
+          phone: '0767395015',
+        },
+        owner.id,
+      );
+
+      await expect(
+        service.getEmployeesByRestaurant(restaurant.id, otherOwner.id),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('throws NotFoundException when restaurant does not exist', async () => {
+      const owner = await authService.createUser({
+        email: 'owner@test.com',
+        password: 'secret123',
+        role: Role.OWNER,
+      });
+
+      await expect(
+        service.getEmployeesByRestaurant(
+          '00000000-0000-0000-0000-000000000000',
+          owner.id,
+        ),
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('returns empty array when restaurant has no employees', async () => {
+      const owner = await authService.createUser({
+        email: 'owner@test.com',
+        password: 'secret123',
+        role: Role.OWNER,
+      });
+
+      const restaurant = await restaurants.create(
+        {
+          name: 'test',
+          email: 'test@mail.com',
+          address: '33 rue sadi carnot',
+          phone: '0767395015',
+        },
+        owner.id,
+      );
+
+      const employees = await service.getEmployeesByRestaurant(
+        restaurant.id,
+        owner.id,
+      );
+
+      expect(employees).toHaveLength(0);
+    });
+  });
 });
