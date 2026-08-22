@@ -20,4 +20,8 @@ export class EmployeesInMemoryRepository implements EmployeesRepository {
   async findByRestaurantId(restaurantId: string): Promise<Employee[]> {
     return this.employees.filter((e) => e.restaurantId === restaurantId);
   }
+
+  async findById(employeeId: string): Promise<Employee | null> {
+    return this.employees.find((e) => e.id === employeeId) ?? null;
+  }
 }
