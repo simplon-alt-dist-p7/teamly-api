@@ -1,0 +1,9 @@
+import { Shift } from '../domain/models/shift.entity';
+
+export interface ShiftRepository {
+  save(shift: Shift): Promise<Shift>;
+  findByEmployeeId(employeeId: string): Promise<Shift[]>;
+  findByRestaurantId(restaurantId: string): Promise<Shift[]>;
+}
+
+export const SHIFT_REPOSITORY = Symbol('SHIFT_REPOSITORY');

@@ -20,4 +20,8 @@ export class EmployeesPrismaRepository implements EmployeesRepository {
   async findByRestaurantId(restaurantId: string): Promise<Employee[]> {
     return this.prisma.employee.findMany({ where: { restaurantId } });
   }
+
+  async findById(employeeId: string): Promise<Employee | null> {
+    return this.prisma.employee.findUnique({ where: { id: employeeId } });
+  }
 }
