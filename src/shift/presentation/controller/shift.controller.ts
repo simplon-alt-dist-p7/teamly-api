@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Param, Post, Req, UseGuards } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { AuthGuard, type AuthenticatedRequest } from 'src/auth/auth.guard';
 import { CreateShiftCommand } from '../../applications/use-cases/commands/create-shift/create-shift.command';
@@ -9,6 +9,7 @@ export class ShiftController {
   constructor(private readonly commandBus: CommandBus) {}
 
   @UseGuards(AuthGuard)
+  @Post()
   create(
     @Body() dto: CreateShiftDto,
     @Req() req: AuthenticatedRequest,

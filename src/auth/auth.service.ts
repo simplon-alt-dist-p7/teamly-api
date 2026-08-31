@@ -15,7 +15,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-  ) { }
+  ) {}
 
   async createUser(createUserDto: CreateUserRequest): Promise<UserResponse> {
     const { password, role, email } = createUserDto;
