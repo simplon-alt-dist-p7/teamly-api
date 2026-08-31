@@ -6,4 +6,5 @@ export const RESTAURANTS_REPOSITORY = Symbol('RESTAURANTS_REPOSITORY');
 export interface RestaurantsRepository {
   create(data: CreateRestaurantRequest, ownerId: string): Promise<Restaurant>;
   findById(id: string): Promise<Restaurant | null>;
+  findByOwnerId(ownerId: string): Promise<Restaurant[]>;
 }

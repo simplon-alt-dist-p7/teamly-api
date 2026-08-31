@@ -1,5 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { randomUUID } from 'node:crypto';
 import { RestaurantsInMemoryRepository } from '../../data-access/adapters/restaurants-in-memory.repository';
 import { RESTAURANTS_REPOSITORY } from '../../data-access/restaurants.repository';
 import { RestaurantService } from '../../restaurant.service';
@@ -46,5 +47,51 @@ describe('RestaurantService', () => {
     expect(result.phone).toBe(validRestaurantData.phone);
     expect(result.email).toBe(validRestaurantData.email);
     expect(result.ownerId).toBe('owner-1');
+  });
+
+  describe('findByOwnerId', () => {
+    it('should throw BadRequestException if ownerId is missing', async () => {
+      await expect(service.findByOwnerId('')).rejects.toThrow(
+        BadRequestException,
+      );
+
+      expect(repo.restaurants).toHaveLength(0);
+    });
+
+    it('should return all restaurants, given ownerId linked to restaurant ', async () => {
+      const ownerId = randomUUID();
+      const otherOwnerId = randomUUID();
+
+      await service.createRestaurant(
+        { ...validRestaurantData, name: 'restaurantA' },
+        ownerId,
+      );
+
+      await service.createRestaurant(
+        { ...validRestaurantData, name: 'restaurantB' },
+        ownerId,
+      );
+
+      await service.createRestaurant(
+        { ...validRestaurantData, name: 'otherRestaurantC' },
+        otherOwnerId,
+      );
+
+      const result = await service.findByOwnerId(ownerId);
+
+      expect(result).toHaveLength(2);
+      expect(result.every((restaurant) => restaurant.ownerId === ownerId)).toBe(
+        true,
+      );
+      expect(result.map((r) => r.name).sort()).toEqual([
+        'restaurantA',
+        'restaurantB',
+      ]);
+    });
+
+    it('returns empty array when owner has no restaurants', async () => {
+      const result = await service.findByOwnerId(randomUUID());
+      expect(result).toEqual([]);
+    });
   });
 });

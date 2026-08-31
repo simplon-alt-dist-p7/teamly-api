@@ -21,4 +21,12 @@ export class RestaurantService {
 
     return this.restaurantsRepository.create(data, ownerId);
   }
+
+  async findByOwnerId(ownerId: string): Promise<Restaurant[]> {
+    if (!ownerId) {
+      throw new BadRequestException('ownerId is mandatatory');
+    }
+
+    return this.restaurantsRepository.findByOwnerId(ownerId);
+  }
 }
