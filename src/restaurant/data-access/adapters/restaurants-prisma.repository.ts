@@ -8,6 +8,10 @@ import { RestaurantsRepository } from '../restaurants.repository';
 export class RestaurantsPrismaRepository implements RestaurantsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findByOwnerId(ownerId: string): Promise<Restaurant[]> {
+    return this.prisma.restaurant.findMany({ where: { ownerId } });
+  }
+
   async create(
     data: CreateRestaurantRequest,
     ownerId: string,

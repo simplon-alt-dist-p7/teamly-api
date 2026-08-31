@@ -23,7 +23,8 @@
     "test:e2e": "npm run db:test:setup && dotenv -e .env.test -- jest --runInBand --config ./test/jest-e2e.json",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand"
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "git": "git add . && npx git-cz"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

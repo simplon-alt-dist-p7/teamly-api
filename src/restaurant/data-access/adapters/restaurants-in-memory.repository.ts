@@ -30,4 +30,10 @@ export class RestaurantsInMemoryRepository implements RestaurantsRepository {
   async findById(id: string): Promise<Restaurant | null> {
     return this.restaurants.find((r) => r.id === id) ?? null;
   }
+
+  async findByOwnerId(ownerId: string): Promise<Restaurant[]> {
+    return this.restaurants.filter(
+      (restaurant) => restaurant.ownerId === ownerId,
+    );
+  }
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import type { AuthenticatedRequest } from 'src/auth/auth.guard';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { CreateRestaurantRequest } from './dtos/request/create-restaurant-dto';
@@ -15,5 +15,12 @@ export class RestaurantController {
   ) {
     // req.user.sub = id du OWNER
     return this.restaurantService.createRestaurant(dto, req.user.sub);
+  }
+
+  @UseGuards(AuthGuard)
+  @Get()
+  findByOwnerId(@Req() req: AuthenticatedRequest) {
+    // req.user.sub = id du OWNER
+    return this.restaurantService.findByOwnerId(req.user.sub);
   }
 }
