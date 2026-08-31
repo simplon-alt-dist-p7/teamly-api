@@ -42,6 +42,7 @@ describe('employee service ', () => {
   });
 
   beforeEach(async () => {
+    await prisma.shift.deleteMany();
     await prisma.employee.deleteMany();
     await prisma.restaurant.deleteMany();
     await prisma.user.deleteMany();
