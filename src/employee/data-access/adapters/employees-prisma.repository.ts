@@ -2,7 +2,10 @@
 import { Injectable } from '@nestjs/common';
 import { Employee } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
-import { EmployeesRepository } from '../employees.repository';
+import {
+  EmployeeListRecord,
+  EmployeesRepository,
+} from '../employees.repository';
 
 @Injectable()
 export class EmployeesPrismaRepository implements EmployeesRepository {
@@ -17,8 +20,23 @@ export class EmployeesPrismaRepository implements EmployeesRepository {
     return this.prisma.employee.create({ data });
   }
 
-  async findByRestaurantId(restaurantId: string): Promise<Employee[]> {
-    return this.prisma.employee.findMany({ where: { restaurantId } });
+  async findByRestaurantId(
+    restaurantId: string,
+  ): Promise<EmployeeListRecord[]> {
+    const employees = await this.prisma.employee.findMany({
+      where: { restaurantId },
+      include: {
+        user: { select: { email: true } },
+      },
+    });
+
+    return employees.map((employee) => ({
+      id: employee.id,
+      firstName: employee.firstName,
+      lastName: employee.lastName,
+      restaurantId: employee.restaurantId,
+      email: employee.user.email,
+    }));
   }
 
   async findById(employeeId: string): Promise<Employee | null> {

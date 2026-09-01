@@ -9,6 +9,14 @@ export interface CreateEmployeeData {
   lastName: string;
 }
 
+export type EmployeeListRecord = {
+  readonly id: string;
+  readonly firstName: string;
+  readonly lastName: string;
+  readonly restaurantId: string;
+  readonly email: string;
+};
+
 export interface EmployeesRepository {
   create(data: {
     userId: string;
@@ -16,6 +24,6 @@ export interface EmployeesRepository {
     firstName: string;
     lastName: string;
   }): Promise<Employee>;
-  findByRestaurantId(restaurantId: string): Promise<Employee[]>;
+  findByRestaurantId(restaurantId: string): Promise<EmployeeListRecord[]>;
   findById(employeeId: string): Promise<Employee | null>;
 }

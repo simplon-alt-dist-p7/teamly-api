@@ -10,6 +10,7 @@ import {
 import type { AuthenticatedRequest } from 'src/auth/auth.guard';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { CreateEmployeeRequest } from './dtos/request/create-employee-dto';
+import { EmployeesListResponse } from './dtos/response/employee-list-dto';
 import { EmployeeService } from './employee.service';
 @Controller('restaurant/:restaurantId/employees')
 export class EmployeeController {
@@ -28,14 +29,16 @@ export class EmployeeController {
 
   @UseGuards(AuthGuard)
   @Get()
-  get(
+  async get(
     @Req() req: AuthenticatedRequest,
     @Param('restaurantId') restaurantId: string,
   ) {
     // req.user.sub = id du OWNER
-    return this.employeeService.getEmployeesByRestaurant(
+    const result = await this.employeeService.getEmployeesByRestaurant(
       restaurantId,
       req.user.sub,
     );
+
+    return new EmployeesListResponse(result);
   }
 }

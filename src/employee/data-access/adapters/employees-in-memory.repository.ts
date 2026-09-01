@@ -4,6 +4,7 @@ import { Employee } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import {
   CreateEmployeeData,
+  EmployeeListRecord,
   EmployeesRepository,
 } from '../employees.repository';
 
@@ -16,9 +17,18 @@ export class EmployeesInMemoryRepository implements EmployeesRepository {
     this.employees.push(employee);
     return employee;
   }
-
-  async findByRestaurantId(restaurantId: string): Promise<Employee[]> {
-    return this.employees.filter((e) => e.restaurantId === restaurantId);
+  async findByRestaurantId(
+    restaurantId: string,
+  ): Promise<EmployeeListRecord[]> {
+    return this.employees
+      .filter((employee) => employee.restaurantId === restaurantId)
+      .map((employee) => ({
+        id: employee.id,
+        firstName: employee.firstName,
+        lastName: employee.lastName,
+        restaurantId: employee.restaurantId,
+        email: `${employee.firstName.toLowerCase()}@test.com`,
+      }));
   }
 
   async findById(employeeId: string): Promise<Employee | null> {
