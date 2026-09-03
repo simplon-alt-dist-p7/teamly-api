@@ -16,6 +16,6 @@ export class ShiftsInMemoryRepository implements ShiftRepository {
   }
 
   async findByRestaurantId(_restaurantId: string): Promise<Shift[]> {
-    return [];
+    return this.shifts;
   }
 }
