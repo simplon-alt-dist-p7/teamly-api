@@ -24,6 +24,14 @@ export class Shift {
     );
   }
 
+  cloneWithNewTimeRange(timeRange: TimeRange): Shift {
+    return new Shift({
+      id: this.id,
+      employeeId: this.employeeId,
+      timeRange: timeRange,
+    });
+  }
+
   get startTime(): Date {
     return this.timeRange.startTime;
   }

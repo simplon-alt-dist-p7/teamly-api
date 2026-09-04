@@ -5,6 +5,7 @@ import { EmployeeModule } from 'src/employee/employee.module';
 import { RestaurantModule } from 'src/restaurant/restaurant.module';
 import { CreateShiftHandler } from './applications/use-cases/commands/create-shift/create-shift.handler';
 import { DuplicateWeekHandler } from './applications/use-cases/commands/duplicate-week/duplicate-shift.handler';
+import { UpdateShiftHandler } from './applications/use-cases/commands/update-shift/update-shift.handler';
 import { GetShiftsByRestaurantHandler } from './applications/use-cases/queries/get-shifts-by-restaurant-id.handler';
 import { ShiftsPrismaRepository } from './data-access/adapters/shifts-prisma.repository';
 import { SHIFT_REPOSITORY } from './data-access/shifts.repository';
@@ -20,6 +21,7 @@ import { ShiftService } from './shift.service';
     CreateShiftHandler,
     GetShiftsByRestaurantHandler,
     DuplicateWeekHandler,
+    UpdateShiftHandler,
   ],
   controllers: [ShiftController, RestaurantShiftsController],
 })

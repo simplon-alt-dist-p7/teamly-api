@@ -8,6 +8,26 @@ import { ShiftRepository } from '../shifts.repository';
 export class ShiftsPrismaRepository implements ShiftRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findById(id: string): Promise<Shift | null> {
+    const row = await this.prisma.shift.findUnique({
+      where: { id },
+    });
+    if (!row) {
+      return null;
+    }
+    return this.toDomain(row);
+  }
+  async update(shift: Shift): Promise<Shift> {
+    const updated = await this.prisma.shift.update({
+      where: { id: shift.id },
+      data: {
+        startTime: shift.startTime,
+        endTime: shift.endTime,
+      },
+    });
+    return this.toDomain(updated);
+  }
+
   async save(shift: Shift): Promise<Shift> {
     const saved = await this.prisma.shift.create({
       data: {

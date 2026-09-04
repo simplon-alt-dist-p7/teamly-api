@@ -79,4 +79,45 @@ describe('Shift', () => {
       expect(shift.endTime).toEqual(morning.endTime);
     });
   });
+
+  describe('cloneWithNewTimeRange', () => {
+    it('keeps the same id and employeeId', () => {
+      const shift = new Shift({
+        id: 'shift-1',
+        employeeId,
+        timeRange: morning,
+      });
+
+      const cloned = shift.cloneWithNewTimeRange(afternoon);
+
+      expect(cloned.id).toBe(shift.id);
+      expect(cloned.employeeId).toBe(shift.employeeId);
+    });
+
+    it('uses the new time range', () => {
+      const shift = new Shift({
+        id: 'shift-1',
+        employeeId,
+        timeRange: morning,
+      });
+
+      const cloned = shift.cloneWithNewTimeRange(afternoon);
+
+      expect(cloned.startTime).toEqual(afternoon.startTime);
+      expect(cloned.endTime).toEqual(afternoon.endTime);
+    });
+
+    it('does not mutate the original shift', () => {
+      const shift = new Shift({
+        id: 'shift-1',
+        employeeId,
+        timeRange: morning,
+      });
+
+      shift.cloneWithNewTimeRange(afternoon);
+
+      expect(shift.startTime).toEqual(morning.startTime);
+      expect(shift.endTime).toEqual(morning.endTime);
+    });
+  });
 });

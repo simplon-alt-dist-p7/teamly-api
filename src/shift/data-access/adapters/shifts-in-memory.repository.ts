@@ -18,4 +18,16 @@ export class ShiftsInMemoryRepository implements ShiftRepository {
   async findByRestaurantId(_restaurantId: string): Promise<Shift[]> {
     return this.shifts;
   }
+
+  async findById(id: string): Promise<Shift | null> {
+    return this.shifts.find((shift) => shift.id === id) ?? null;
+  }
+  async update(shift: Shift): Promise<Shift> {
+    const index = this.shifts.findIndex((s) => s.id === shift.id);
+    if (index === -1) {
+      throw new Error(`Shift ${shift.id} not found`);
+    }
+    this.shifts[index] = shift;
+    return shift;
+  }
 }
