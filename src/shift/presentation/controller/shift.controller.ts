@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  Delete,
+  HttpCode,
   Param,
   Patch,
   Post,
@@ -9,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { AuthGuard, type AuthenticatedRequest } from 'src/auth/auth.guard';
+import { DeleteShiftCommand } from 'src/shift/applications/use-cases/commands/delete-shift/delete-shift.command';
 import { UpdateShiftCommand } from 'src/shift/applications/use-cases/commands/update-shift/update-shift.command';
 import { CreateShiftCommand } from '../../applications/use-cases/commands/create-shift/create-shift.command';
 import { CreateShiftDto } from '../dto/request/create-shift-dtos';
@@ -49,6 +52,15 @@ export class ShiftController {
         new Date(dto.endTime),
         req.user.sub,
       ),
+    );
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete(':shiftId')
+  @HttpCode(204)
+  delete(@Param('shiftId') shiftId: string, @Req() req: AuthenticatedRequest) {
+    return this.commandBus.execute(
+      new DeleteShiftCommand(shiftId, req.user.sub),
     );
   }
 }

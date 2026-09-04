@@ -8,6 +8,12 @@ import { ShiftRepository } from '../shifts.repository';
 export class ShiftsPrismaRepository implements ShiftRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async delete(id: string): Promise<void> {
+    await this.prisma.shift.delete({
+      where: { id },
+    });
+  }
+
   async findById(id: string): Promise<Shift | null> {
     const row = await this.prisma.shift.findUnique({
       where: { id },

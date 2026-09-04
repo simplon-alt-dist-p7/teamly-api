@@ -11,6 +11,10 @@ export class ShiftsInMemoryRepository implements ShiftRepository {
     return shift;
   }
 
+  async delete(id: string): Promise<void> {
+    this.shifts = this.shifts.filter((shift) => shift.id !== id);
+  }
+
   async findByEmployeeId(employeeId: string): Promise<Shift[]> {
     return this.shifts.filter((s) => s.employeeId === employeeId);
   }

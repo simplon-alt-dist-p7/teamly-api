@@ -4,6 +4,7 @@ import { PrismaModule } from 'prisma/prisma.module';
 import { EmployeeModule } from 'src/employee/employee.module';
 import { RestaurantModule } from 'src/restaurant/restaurant.module';
 import { CreateShiftHandler } from './applications/use-cases/commands/create-shift/create-shift.handler';
+import { DeleteShiftHandler } from './applications/use-cases/commands/delete-shift/delete-shift.handler';
 import { DuplicateWeekHandler } from './applications/use-cases/commands/duplicate-week/duplicate-shift.handler';
 import { UpdateShiftHandler } from './applications/use-cases/commands/update-shift/update-shift.handler';
 import { GetShiftsByRestaurantHandler } from './applications/use-cases/queries/get-shifts-by-restaurant-id.handler';
@@ -22,6 +23,7 @@ import { ShiftService } from './shift.service';
     GetShiftsByRestaurantHandler,
     DuplicateWeekHandler,
     UpdateShiftHandler,
+    DeleteShiftHandler,
   ],
   controllers: [ShiftController, RestaurantShiftsController],
 })
