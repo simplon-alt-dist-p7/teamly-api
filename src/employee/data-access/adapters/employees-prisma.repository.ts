@@ -42,4 +42,17 @@ export class EmployeesPrismaRepository implements EmployeesRepository {
   async findById(employeeId: string): Promise<Employee | null> {
     return this.prisma.employee.findUnique({ where: { id: employeeId } });
   }
+
+  async delete(employeeId: string): Promise<void> {
+    const employee = await this.prisma.employee.findUnique({
+      where: { id: employeeId },
+    });
+    if (!employee) return;
+    await this.prisma.$transaction([
+      this.prisma.shift.deleteMany({ where: { employeeId } }),
+      this.prisma.leaveRequest.deleteMany({ where: { employeeId } }),
+      this.prisma.employee.delete({ where: { id: employeeId } }),
+      this.prisma.user.delete({ where: { id: employee.userId } }),
+    ]);
+  }
 }

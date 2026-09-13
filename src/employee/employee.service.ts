@@ -65,4 +65,29 @@ export class EmployeeService {
 
     return this.employeesRepository.findByRestaurantId(restaurantId);
   }
+
+  async deleteEmployee(
+    restaurantId: string,
+    employeeId: string,
+    ownerId: string,
+  ): Promise<void> {
+    const restaurant = await this.restaurantsRepository.findById(restaurantId);
+
+    if (!restaurant) {
+      throw new NotFoundException('Restaurant introuvable');
+    }
+
+    if (restaurant.ownerId !== ownerId) {
+      throw new ForbiddenException(
+        "Vous n'êtes pas le propriétaire de ce restaurant",
+      );
+    }
+
+    const employee = await this.employeesRepository.findById(employeeId);
+    if (!employee || employee.restaurantId !== restaurantId) {
+      throw new NotFoundException('Employé introuvable');
+    }
+
+    await this.employeesRepository.delete(employeeId);
+  }
 }

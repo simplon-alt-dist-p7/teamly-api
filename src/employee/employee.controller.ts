@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Param,
   Post,
   Req,
@@ -40,5 +42,20 @@ export class EmployeeController {
     );
 
     return new EmployeesListResponse(result);
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete(':employeeId')
+  @HttpCode(204)
+  delete(
+    @Param('restaurantId') restaurantId: string,
+    @Param('employeeId') employeeId: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.employeeService.deleteEmployee(
+      restaurantId,
+      employeeId,
+      req.user.sub,
+    );
   }
 }
