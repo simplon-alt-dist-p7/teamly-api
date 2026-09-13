@@ -42,6 +42,7 @@ describe('employee service ', () => {
   });
 
   beforeEach(async () => {
+    await prisma.leaveRequest.deleteMany();
     await prisma.shift.deleteMany();
     await prisma.employee.deleteMany();
     await prisma.restaurant.deleteMany();
@@ -346,6 +347,109 @@ describe('employee service ', () => {
       );
 
       expect(employees).toHaveLength(0);
+    });
+  });
+
+  describe('deleteEmployee', () => {
+    it('deletes employee, shifts and user', async () => {
+      const owner = await authService.createUser({
+        email: 'owner@test.com',
+        password: 'secret123',
+        role: Role.OWNER,
+      });
+
+      const restaurant = await restaurants.create(
+        {
+          name: 'test',
+          email: 'test@mail.com',
+          address: '33 rue sadi carnot',
+          phone: '0767395015',
+        },
+        owner.id,
+      );
+
+      const employee = await service.createEmployee(
+        restaurant.id,
+        employeeDto,
+        owner.id,
+      );
+
+      await prisma.shift.create({
+        data: {
+          employeeId: employee.id,
+          startTime: new Date('2026-09-14T10:00:00.000Z'),
+          endTime: new Date('2026-09-14T14:00:00.000Z'),
+        },
+      });
+
+      await service.deleteEmployee(restaurant.id, employee.id, owner.id);
+
+      expect(await prisma.employee.findMany()).toHaveLength(0);
+      expect(await prisma.shift.findMany()).toHaveLength(0);
+      expect(
+        await prisma.user.findUnique({ where: { email: employeeDto.email } }),
+      ).toBeNull();
+    });
+
+    it('throws ForbiddenException when owner is not valid', async () => {
+      const owner = await authService.createUser({
+        email: 'owner@test.com',
+        password: 'secret123',
+        role: Role.OWNER,
+      });
+      const otherOwner = await authService.createUser({
+        email: 'other@test.com',
+        password: 'secret123',
+        role: Role.OWNER,
+      });
+
+      const restaurant = await restaurants.create(
+        {
+          name: 'test',
+          email: 'test@mail.com',
+          address: '33 rue sadi carnot',
+          phone: '0767395015',
+        },
+        owner.id,
+      );
+
+      const employee = await service.createEmployee(
+        restaurant.id,
+        employeeDto,
+        owner.id,
+      );
+
+      await expect(
+        service.deleteEmployee(restaurant.id, employee.id, otherOwner.id),
+      ).rejects.toThrow(ForbiddenException);
+
+      expect(await prisma.employee.findMany()).toHaveLength(1);
+    });
+
+    it('throws NotFoundException when employee does not exist', async () => {
+      const owner = await authService.createUser({
+        email: 'owner@test.com',
+        password: 'secret123',
+        role: Role.OWNER,
+      });
+
+      const restaurant = await restaurants.create(
+        {
+          name: 'test',
+          email: 'test@mail.com',
+          address: '33 rue sadi carnot',
+          phone: '0767395015',
+        },
+        owner.id,
+      );
+
+      await expect(
+        service.deleteEmployee(
+          restaurant.id,
+          '00000000-0000-0000-0000-000000000000',
+          owner.id,
+        ),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 });
