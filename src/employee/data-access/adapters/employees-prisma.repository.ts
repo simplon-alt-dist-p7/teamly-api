@@ -43,6 +43,10 @@ export class EmployeesPrismaRepository implements EmployeesRepository {
     return this.prisma.employee.findUnique({ where: { id: employeeId } });
   }
 
+  async findByUserId(userId: string): Promise<Employee | null> {
+    return this.prisma.employee.findUnique({ where: { userId } });
+  }
+
   async delete(employeeId: string): Promise<void> {
     const employee = await this.prisma.employee.findUnique({
       where: { id: employeeId },

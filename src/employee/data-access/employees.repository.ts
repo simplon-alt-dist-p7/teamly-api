@@ -26,5 +26,6 @@ export interface EmployeesRepository {
   }): Promise<Employee>;
   findByRestaurantId(restaurantId: string): Promise<EmployeeListRecord[]>;
   findById(employeeId: string): Promise<Employee | null>;
+  findByUserId(userId: string): Promise<Employee | null>;
   delete(employeeId: string): Promise<void>;
 }

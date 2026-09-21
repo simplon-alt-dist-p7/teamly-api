@@ -35,6 +35,10 @@ export class EmployeesInMemoryRepository implements EmployeesRepository {
     return this.employees.find((e) => e.id === employeeId) ?? null;
   }
 
+  async findByUserId(userId: string): Promise<Employee | null> {
+    return this.employees.find((e) => e.userId === userId) ?? null;
+  }
+
   async delete(employeeId: string): Promise<void> {
     this.employees = this.employees.filter((e) => e.id !== employeeId);
   }
