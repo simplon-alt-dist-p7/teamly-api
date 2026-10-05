@@ -45,7 +45,6 @@ model Employee {
   lastName      String
   shifts        Shift[]
   leaveRequests LeaveRequest[]
-  employeeCode  String?        @unique
   restaurantId  String
   restaurant    Restaurant     @relation(fields: [restaurantId], references: [id])
 }
@@ -56,8 +55,6 @@ model Shift {
   employee   Employee @relation(fields: [employeeId], references: [id])
   startTime  DateTime
   endTime    DateTime
-
-  @@unique([employeeId, startTime])
 }
 
 model LeaveRequest {
@@ -67,8 +64,6 @@ model LeaveRequest {
   startDate  DateTime
   endDate    DateTime
   status     LeaveStatus @default(PENDING)
-
-  @@unique([employeeId, startDate])
 }
 
 model Restaurant {
@@ -76,7 +71,7 @@ model Restaurant {
   name      String
   address   String
   phone     String
-  email     String     @unique
+  email     String
   employees Employee[]
   ownerId   String
   owner     User       @relation(fields: [ownerId], references: [id])
