@@ -14,6 +14,7 @@ import { AuthService } from './auth.service';
 import { CreateUserRequest } from './dtos/request/create-user-dto';
 import { ForgotPasswordRequest } from './dtos/request/forgot-password-dto';
 import { LoginUserRequest } from './dtos/request/login-user-dto';
+import { ResetPasswordRequest } from './dtos/request/reset-password-dto';
 import { LoginResponse } from './dtos/response/login-response-dto';
 import { UserResponse } from './dtos/response/user-response-dto';
 
@@ -47,5 +48,11 @@ export class AuthController {
   @Post('/forgot-password')
   forgotPassword(@Body() body: ForgotPasswordRequest) {
     return this.authService.forgotPassword(body.email);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('/reset-password')
+  resetPassword(@Body() body: ResetPasswordRequest) {
+    return this.authService.resetPassword(body.token, body.password);
   }
 }
