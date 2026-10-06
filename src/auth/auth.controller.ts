@@ -1,8 +1,18 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { CreateUserRequest } from './dtos/request/create-user-dto';
+import { ForgotPasswordRequest } from './dtos/request/forgot-password-dto';
 import { LoginUserRequest } from './dtos/request/login-user-dto';
 import { LoginResponse } from './dtos/response/login-response-dto';
 import { UserResponse } from './dtos/response/user-response-dto';
@@ -31,5 +41,11 @@ export class AuthController {
   @Post('/login')
   async login(@Body() loginRequest: LoginUserRequest): Promise<LoginResponse> {
     return this.authService.login(loginRequest);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('/forgot-password')
+  forgotPassword(@Body() body: ForgotPasswordRequest) {
+    return this.authService.forgotPassword(body.email);
   }
 }

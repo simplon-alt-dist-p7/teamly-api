@@ -6,10 +6,15 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'prisma/prisma.service';
+import { resetTokenSecret } from './constants';
 import { CreateUserRequest } from './dtos/request/create-user-dto';
 import { LoginUserRequest } from './dtos/request/login-user-dto';
 import { LoginResponse } from './dtos/response/login-response-dto';
 import { UserResponse } from './dtos/response/user-response-dto';
+
+export const FORGOT_PASSWORD_MESSAGE =
+  'Si un compte existe, un email a été envoyé';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -72,5 +77,24 @@ export class AuthService {
     });
 
     return new LoginResponse(accessToken);
+  }
+
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (user) {
+      const token = this.jwtService.sign(
+        { sub: user.id },
+        { secret: resetTokenSecret(user.password), expiresIn: '1h' },
+      );
+      const frontUrl = process.env.FRONT_URL ?? 'http://localhost:3001';
+      console.log(
+        `Lien de réinitialisation : ${frontUrl}/reset-password?token=${token}`,
+      );
+    }
+
+    return { message: FORGOT_PASSWORD_MESSAGE };
   }
 }
