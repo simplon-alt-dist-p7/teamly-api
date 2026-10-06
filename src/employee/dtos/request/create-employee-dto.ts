@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, MaxLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
 
 export class CreateEmployeeRequest {
   @IsNotEmpty()
@@ -6,6 +6,7 @@ export class CreateEmployeeRequest {
   readonly email: string;
 
   @IsNotEmpty()
+  @MinLength(8)
   @MaxLength(255)
   readonly password: string;
 
