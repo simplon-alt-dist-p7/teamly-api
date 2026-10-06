@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { Role } from '@prisma/client';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { CreateUserRequest } from './dtos/request/create-user-dto';
@@ -21,7 +22,10 @@ export class AuthController {
   async registerUser(
     @Body() createUserRequest: CreateUserRequest,
   ): Promise<UserResponse> {
-    return this.authService.createUser(createUserRequest);
+    return this.authService.createUser({
+      ...createUserRequest,
+      role: Role.OWNER,
+    });
   }
 
   @Post('/login')
