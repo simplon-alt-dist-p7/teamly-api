@@ -66,7 +66,9 @@ export class CreateShiftHandler implements ICommandHandler<
     );
 
     if (existing.some((shift) => newShift.overlapsWith(shift))) {
-      throw new ConflictException('Employee already has an overlapping shift');
+      throw new ConflictException(
+        'Cet employé a déjà un créneau sur cet horaire',
+      );
     }
     const shiftSaved = await this.shiftsRepository.save(newShift);
     return shiftSaved;
