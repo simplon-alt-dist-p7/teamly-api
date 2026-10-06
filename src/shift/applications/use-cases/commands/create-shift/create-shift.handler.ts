@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Inject,
@@ -14,6 +15,7 @@ import {
   SHIFT_REPOSITORY,
   type ShiftRepository,
 } from 'src/shift/data-access/shifts.repository';
+import { InvalidTimeRangeError } from 'src/shift/domain/errors/time-range.errors';
 import { Shift } from 'src/shift/domain/models/shift.entity';
 import { TimeRange } from 'src/shift/domain/value-objects/timeRange';
 import { CreateShiftCommand } from './create-shift.command';
@@ -50,10 +52,20 @@ export class CreateShiftHandler implements ICommandHandler<
       throw new ForbiddenException('You are not the owner of this restaurant');
     }
 
-    const timeRange = new TimeRange({
-      startTime: command.startTime,
-      endTime: command.endTime,
-    });
+    let timeRange: TimeRange;
+    try {
+      timeRange = new TimeRange({
+        startTime: command.startTime,
+        endTime: command.endTime,
+      });
+    } catch (error) {
+      if (error instanceof InvalidTimeRangeError) {
+        throw new BadRequestException(
+          "L'heure de fin doit être après l'heure de début",
+        );
+      }
+      throw error;
+    }
 
     const newShift = new Shift({
       id: randomUUID(),

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   NotFoundException,
@@ -181,5 +182,28 @@ describe('UpdateShiftHandler', () => {
 
     expect(result.startTime).toEqual(newStart);
     expect(result.endTime).toEqual(newEnd);
+  });
+
+  it('throws BadRequestException when the updated time range is invalid', async () => {
+    const employee = await setupEmployee();
+    const shift = await createHandler.execute(
+      new CreateShiftCommand(
+        employee.id,
+        new Date('2026-08-19T09:00:00.000Z'),
+        new Date('2026-08-19T17:00:00.000Z'),
+        ownerId,
+      ),
+    );
+
+    await expect(
+      updateHandler.execute(
+        new UpdateShiftCommand(
+          shift.id,
+          new Date('2026-08-19T18:00:00.000Z'),
+          new Date('2026-08-19T10:00:00.000Z'),
+          ownerId,
+        ),
+      ),
+    ).rejects.toThrow(BadRequestException);
   });
 });

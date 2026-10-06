@@ -1,5 +1,6 @@
 // src/shift/applications/use-cases/commands/create-shift/tests/create-shift.handler.spec.ts
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   NotFoundException,
@@ -148,5 +149,28 @@ describe('CreateShiftHandler', () => {
 
     expect(result.employeeId).toBe(employee.id);
     expect(shiftsRepository.shifts).toHaveLength(1);
+  });
+
+  it('throws BadRequestException when the time range is invalid', async () => {
+    const restaurant = await restaurantsRepository.create(
+      validRestaurantData,
+      ownerId,
+    );
+    const employee = await employeesRepository.create({
+      userId: 'user-1',
+      restaurantId: restaurant.id,
+      firstName: 'Alice',
+      lastName: 'Martin',
+    });
+
+    const command = new CreateShiftCommand(
+      employee.id,
+      new Date('2026-08-19T17:00:00.000Z'),
+      new Date('2026-08-19T09:00:00.000Z'),
+      ownerId,
+    );
+
+    await expect(handler.execute(command)).rejects.toThrow(BadRequestException);
+    expect(shiftsRepository.shifts).toHaveLength(0);
   });
 });
