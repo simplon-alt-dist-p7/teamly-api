@@ -1,16 +1,20 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from 'prisma/prisma.service';
+import type { EmailSender } from '../email/email-sender';
+import { EMAIL_SENDER } from '../email/email-sender';
 import { resetTokenSecret } from './constants';
 import { CreateUserRequest } from './dtos/request/create-user-dto';
 import { LoginUserRequest } from './dtos/request/login-user-dto';
 import { LoginResponse } from './dtos/response/login-response-dto';
 import { UserResponse } from './dtos/response/user-response-dto';
+import { resetPasswordEmail } from './emails/reset-password.email';
 
 export const FORGOT_PASSWORD_MESSAGE =
   'Si un compte existe, un email a été envoyé';
@@ -24,6 +28,8 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    @Inject(EMAIL_SENDER)
+    private readonly emailSender: EmailSender,
   ) {}
 
   async createUser(createUserDto: CreateUserRequest): Promise<UserResponse> {
@@ -94,9 +100,16 @@ export class AuthService {
         { secret: resetTokenSecret(user.password), expiresIn: '1h' },
       );
       const frontUrl = process.env.FRONT_URL ?? 'http://localhost:3001';
-      console.log(
-        `Lien de réinitialisation : ${frontUrl}/reset-password?token=${token}`,
-      );
+      const resetLink = `${frontUrl}/reset-password?token=${token}`;
+
+      try {
+        await this.emailSender.send(resetPasswordEmail(user.email, resetLink));
+      } catch (error) {
+        console.error(
+          "Échec de l'envoi de l'email de réinitialisation :",
+          error instanceof Error ? error.message : error,
+        );
+      }
     }
 
     return { message: FORGOT_PASSWORD_MESSAGE };
