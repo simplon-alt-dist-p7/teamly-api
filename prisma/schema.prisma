@@ -77,4 +77,22 @@ model Restaurant {
   owner     User       @relation(fields: [ownerId], references: [id])
   // éventuellement owners via UserRestaurant / Membership
   createdAt DateTime   @default(now())
+  taskLists TaskList[]
+}
+
+model Task {
+  id         String   @id @default(uuid())
+  label      String
+  taskListId String
+  taskList   TaskList @relation(fields: [taskListId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+}
+
+model TaskList {
+  id           String     @id @default(uuid())
+  name         String
+  restaurantId String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  createdAt    DateTime   @default(now())
+  tasks        Task[]
 }
