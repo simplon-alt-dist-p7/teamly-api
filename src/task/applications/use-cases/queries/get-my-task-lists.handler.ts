@@ -1,0 +1,35 @@
+import { Inject, NotFoundException } from '@nestjs/common';
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
+import type { EmployeesRepository } from 'src/employee/data-access/employees.repository';
+import { EMPLOYEES_REPOSITORY } from 'src/employee/data-access/employees.repository';
+import {
+  TASK_LISTS_REPOSITORY,
+  type TaskListsRepository,
+} from 'src/task/data-access/task-lists.repository';
+import { TaskList } from 'src/task/domain/models/task-list.entity';
+import { GetMyTaskListsQuery } from './get-my-task-lists.query';
+
+@QueryHandler(GetMyTaskListsQuery)
+export class GetMyTaskListsHandler implements IQueryHandler<
+  GetMyTaskListsQuery,
+  TaskList[]
+> {
+  constructor(
+    @Inject(EMPLOYEES_REPOSITORY)
+    private readonly employeesRepository: EmployeesRepository,
+    @Inject(TASK_LISTS_REPOSITORY)
+    private readonly taskListsRepository: TaskListsRepository,
+  ) {}
+
+  async execute(query: GetMyTaskListsQuery): Promise<TaskList[]> {
+    const employee = await this.employeesRepository.findByUserId(
+      query.props.userId,
+    );
+
+    if (!employee) {
+      throw new NotFoundException('Employé introuvable');
+    }
+
+    return this.taskListsRepository.findByRestaurantId(employee.restaurantId);
+  }
+}
