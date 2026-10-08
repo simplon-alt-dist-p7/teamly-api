@@ -23,4 +23,13 @@ export class TaskListsInMemoryRepository implements TaskListsRepository {
     const taskList = this.taskLists.find((list) => list.id === task.taskListId);
     taskList?.tasks.push(task);
   }
+
+  async removeTask(taskId: string): Promise<void> {
+    for (const taskList of this.taskLists) {
+      const index = taskList.tasks.findIndex((task) => task.id === taskId);
+      if (index !== -1) {
+        taskList.tasks.splice(index, 1);
+      }
+    }
+  }
 }

@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
   Param,
   Post,
   Req,
@@ -11,6 +13,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { AuthGuard, type AuthenticatedRequest } from 'src/auth/auth.guard';
 import { AddTaskCommand } from 'src/task/applications/use-cases/commands/add-task/add-task.command';
 import { CreateTaskListCommand } from 'src/task/applications/use-cases/commands/create-task-list/create-task-list.command';
+import { RemoveTaskCommand } from 'src/task/applications/use-cases/commands/remove-task/remove-task.command';
 import { GetTaskListsByRestaurantQuery } from 'src/task/applications/use-cases/queries/get-task-lists-by-restaurant.query';
 import { AddTaskDto } from '../dto/request/add-task.dto';
 import { CreateTaskListDto } from '../dto/request/create-task-list.dto';
@@ -65,6 +68,25 @@ export class TaskListController {
         restaurantId,
         taskListId,
         label: dto.label,
+        ownerId: req.user.sub,
+      }),
+    );
+  }
+
+  @UseGuards(AuthGuard)
+  @Delete(':taskListId/tasks/:taskId')
+  @HttpCode(204)
+  removeTask(
+    @Req() req: AuthenticatedRequest,
+    @Param('restaurantId') restaurantId: string,
+    @Param('taskListId') taskListId: string,
+    @Param('taskId') taskId: string,
+  ) {
+    return this.commandBus.execute(
+      new RemoveTaskCommand({
+        restaurantId,
+        taskListId,
+        taskId,
         ownerId: req.user.sub,
       }),
     );

@@ -47,6 +47,12 @@ export class TaskListsPrismaRepository implements TaskListsRepository {
     });
   }
 
+  async removeTask(taskId: string): Promise<void> {
+    await this.prisma.task.delete({
+      where: { id: taskId },
+    });
+  }
+
   private toDomain(row: {
     id: string;
     restaurantId: string;
