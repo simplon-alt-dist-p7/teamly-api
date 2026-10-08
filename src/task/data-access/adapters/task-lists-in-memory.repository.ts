@@ -6,8 +6,12 @@ import { TaskListsRepository } from '../task-lists.repository';
 export class TaskListsInMemoryRepository implements TaskListsRepository {
   taskLists: TaskList[] = [];
 
-  save(taskList: TaskList): Promise<void> {
+  async save(taskList: TaskList): Promise<void> {
     this.taskLists.push(taskList);
     return Promise.resolve();
+  }
+
+  async findByRestaurantId(restaurantId: string): Promise<TaskList[]> {
+    return this.taskLists.filter((list) => list.restaurantId === restaurantId);
   }
 }
