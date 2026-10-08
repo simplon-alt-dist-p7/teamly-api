@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { TaskList } from '../../domain/models/task-list.entity';
+import { Task } from '../../domain/models/task.entity';
 import { TaskListsRepository } from '../task-lists.repository';
 
 @Injectable()
@@ -8,10 +9,18 @@ export class TaskListsInMemoryRepository implements TaskListsRepository {
 
   async save(taskList: TaskList): Promise<void> {
     this.taskLists.push(taskList);
-    return Promise.resolve();
+  }
+
+  async findById(id: string): Promise<TaskList | null> {
+    return this.taskLists.find((list) => list.id === id) ?? null;
   }
 
   async findByRestaurantId(restaurantId: string): Promise<TaskList[]> {
     return this.taskLists.filter((list) => list.restaurantId === restaurantId);
+  }
+
+  async addTask(task: Task): Promise<void> {
+    const taskList = this.taskLists.find((list) => list.id === task.taskListId);
+    taskList?.tasks.push(task);
   }
 }

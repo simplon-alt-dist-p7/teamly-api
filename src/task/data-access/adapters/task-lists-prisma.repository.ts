@@ -18,6 +18,15 @@ export class TaskListsPrismaRepository implements TaskListsRepository {
     });
   }
 
+  async findById(id: string): Promise<TaskList | null> {
+    const row = await this.prisma.taskList.findUnique({
+      where: { id },
+      include: { tasks: { orderBy: { createdAt: 'asc' } } },
+    });
+
+    return row ? this.toDomain(row) : null;
+  }
+
   async findByRestaurantId(restaurantId: string): Promise<TaskList[]> {
     const rows = await this.prisma.taskList.findMany({
       where: { restaurantId },
@@ -26,6 +35,16 @@ export class TaskListsPrismaRepository implements TaskListsRepository {
     });
 
     return rows.map((row) => this.toDomain(row));
+  }
+
+  async addTask(task: Task): Promise<void> {
+    await this.prisma.task.create({
+      data: {
+        id: task.id,
+        taskListId: task.taskListId,
+        label: task.label,
+      },
+    });
   }
 
   private toDomain(row: {
