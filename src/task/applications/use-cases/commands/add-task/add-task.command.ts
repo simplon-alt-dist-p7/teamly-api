@@ -6,6 +6,7 @@ type AddTaskCommandProps = {
   readonly taskListId: string;
   readonly label: string;
   readonly ownerId: string;
+  readonly requiresValidation: boolean;
 };
 
 export class AddTaskCommand extends Command<Task> {

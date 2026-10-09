@@ -72,11 +72,13 @@ describe('AddTaskHandler', () => {
         taskListId: 'list-1',
         label: 'Allumer la machine à café',
         ownerId,
+        requiresValidation: true,
       }),
     );
 
     expect(result.taskListId).toBe('list-1');
     expect(result.label).toBe('Allumer la machine à café');
+    expect(result.requiresValidation).toBe(true);
     expect(taskListsRepository.taskLists[0].tasks).toEqual([result]);
   });
 
@@ -86,6 +88,7 @@ describe('AddTaskHandler', () => {
       taskListId: 'list-1',
       label: 'Allumer la machine à café',
       ownerId,
+      requiresValidation: false,
     });
 
     await expect(handler.execute(command)).rejects.toThrow(NotFoundException);
@@ -99,6 +102,7 @@ describe('AddTaskHandler', () => {
       taskListId: 'list-1',
       label: 'Allumer la machine à café',
       ownerId: 'someone-else',
+      requiresValidation: false,
     });
 
     await expect(handler.execute(command)).rejects.toThrow(ForbiddenException);
@@ -116,6 +120,7 @@ describe('AddTaskHandler', () => {
       taskListId: 'unknown-list',
       label: 'Allumer la machine à café',
       ownerId,
+      requiresValidation: false,
     });
 
     await expect(handler.execute(command)).rejects.toThrow(NotFoundException);
@@ -144,6 +149,7 @@ describe('AddTaskHandler', () => {
       taskListId: 'list-2',
       label: 'Allumer la machine à café',
       ownerId,
+      requiresValidation: false,
     });
 
     await expect(handler.execute(command)).rejects.toThrow(NotFoundException);
@@ -158,6 +164,7 @@ describe('AddTaskHandler', () => {
       taskListId: 'list-1',
       label: '   ',
       ownerId,
+      requiresValidation: false,
     });
 
     await expect(handler.execute(command)).rejects.toThrow(BadRequestException);

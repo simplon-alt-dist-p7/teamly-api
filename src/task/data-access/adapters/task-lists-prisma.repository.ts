@@ -43,6 +43,7 @@ export class TaskListsPrismaRepository implements TaskListsRepository {
         id: task.id,
         taskListId: task.taskListId,
         label: task.label,
+        requiresValidation: task.requiresValidation,
       },
     });
   }
@@ -57,7 +58,12 @@ export class TaskListsPrismaRepository implements TaskListsRepository {
     id: string;
     restaurantId: string;
     name: string;
-    tasks: { id: string; taskListId: string; label: string }[];
+    tasks: {
+      id: string;
+      taskListId: string;
+      label: string;
+      requiresValidation: boolean;
+    }[];
   }): TaskList {
     return new TaskList({
       id: row.id,
@@ -69,6 +75,7 @@ export class TaskListsPrismaRepository implements TaskListsRepository {
             id: task.id,
             taskListId: task.taskListId,
             label: task.label,
+            requiresValidation: task.requiresValidation,
           }),
       ),
     });

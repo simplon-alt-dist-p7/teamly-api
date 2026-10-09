@@ -16,6 +16,7 @@ type TaskResponseBody = {
   id: string;
   taskListId: string;
   label: string;
+  requiresValidation: boolean;
 };
 
 describe('TaskListController add task E2E', () => {
@@ -90,16 +91,21 @@ describe('TaskListController add task E2E', () => {
     const response = await request(app.getHttpServer())
       .post(`/restaurant/${restaurant.id}/task-lists/${taskList.id}/tasks`)
       .set('Authorization', `Bearer ${accessToken}`)
-      .send({ label: 'Allumer la machine à café' })
+      .send({
+        label: 'Allumer la machine à café',
+        requiresValidation: true,
+      })
       .expect(201);
 
     const task = response.body as TaskResponseBody;
     expect(task.taskListId).toBe(taskList.id);
     expect(task.label).toBe('Allumer la machine à café');
+    expect(task.requiresValidation).toBe(true);
 
     const tasksInDb = await prisma.task.findMany();
     expect(tasksInDb).toHaveLength(1);
     expect(tasksInDb[0].id).toBe(task.id);
+    expect(tasksInDb[0].requiresValidation).toBe(true);
   });
 
   it('POST /restaurant/:restaurantId/task-lists/:taskListId/tasks rejects a missing label', async () => {
@@ -109,7 +115,7 @@ describe('TaskListController add task E2E', () => {
     await request(app.getHttpServer())
       .post(`/restaurant/${restaurant.id}/task-lists/${taskList.id}/tasks`)
       .set('Authorization', `Bearer ${accessToken}`)
-      .send({})
+      .send({ requiresValidation: true })
       .expect(400);
 
     expect(await prisma.task.count()).toBe(0);

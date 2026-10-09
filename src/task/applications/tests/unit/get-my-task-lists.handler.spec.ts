@@ -56,6 +56,7 @@ describe('GetMyTaskListsHandler', () => {
           id: 'task-1',
           taskListId: 'list-1',
           label: 'Allumer la machine à café',
+          requiresValidation: false,
         }),
       ],
     });
@@ -68,6 +69,7 @@ describe('GetMyTaskListsHandler', () => {
           id: 'task-2',
           taskListId: 'list-2',
           label: 'Sortir les poubelles',
+          requiresValidation: false,
         }),
       ],
     });

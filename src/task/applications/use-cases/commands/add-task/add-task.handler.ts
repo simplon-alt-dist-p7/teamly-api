@@ -26,7 +26,8 @@ export class AddTaskHandler implements ICommandHandler<AddTaskCommand, Task> {
   ) {}
 
   async execute(command: AddTaskCommand): Promise<Task> {
-    const { restaurantId, taskListId, label, ownerId } = command.props;
+    const { restaurantId, taskListId, label, ownerId, requiresValidation } =
+      command.props;
 
     const restaurant = await this.restaurantsRepository.findById(restaurantId);
     if (!restaurant) {
@@ -51,6 +52,7 @@ export class AddTaskHandler implements ICommandHandler<AddTaskCommand, Task> {
         id: randomUUID(),
         taskListId,
         label,
+        requiresValidation,
       });
     } catch (error) {
       if (error instanceof EmptyTaskLabelError) {

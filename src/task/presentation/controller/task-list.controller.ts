@@ -69,6 +69,7 @@ export class TaskListController {
         taskListId,
         label: dto.label,
         ownerId: req.user.sub,
+        requiresValidation: dto.requiresValidation,
       }),
     );
   }

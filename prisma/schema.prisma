@@ -81,11 +81,12 @@ model Restaurant {
 }
 
 model Task {
-  id         String   @id @default(uuid())
-  label      String
-  taskListId String
-  taskList   TaskList @relation(fields: [taskListId], references: [id], onDelete: Cascade)
-  createdAt  DateTime @default(now())
+  id                 String   @id @default(uuid())
+  label              String
+  taskListId         String
+  requiresValidation Boolean  @default(false)
+  taskList           TaskList @relation(fields: [taskListId], references: [id], onDelete: Cascade)
+  createdAt          DateTime @default(now())
 }
 
 model TaskList {
