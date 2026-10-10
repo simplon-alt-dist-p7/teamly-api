@@ -5,7 +5,7 @@ import { Task } from '../domain/models/task.entity';
 export interface TaskListsRepository {
   save(taskList: TaskList): Promise<void>;
   findById(id: string): Promise<TaskList | null>;
-  findByRestaurantId(restaurantId: string): Promise<TaskList[]>;
+  findByRestaurantId(restaurantId: string, day?: Date): Promise<TaskList[]>;
   addTask(task: Task): Promise<void>;
   removeTask(taskId: string): Promise<void>;
 

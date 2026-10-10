@@ -28,10 +28,25 @@ export class TaskListsPrismaRepository implements TaskListsRepository {
     return row ? this.toDomain(row) : null;
   }
 
-  async findByRestaurantId(restaurantId: string): Promise<TaskList[]> {
+  async findByRestaurantId(
+    restaurantId: string,
+    day?: Date,
+  ): Promise<TaskList[]> {
     const rows = await this.prisma.taskList.findMany({
       where: { restaurantId },
-      include: { tasks: { orderBy: { createdAt: 'asc' } } },
+      include: {
+        tasks: {
+          orderBy: { createdAt: 'asc' },
+          include: day
+            ? {
+                taskChecks: {
+                  where: { day },
+                  include: { employee: true },
+                },
+              }
+            : undefined,
+        },
+      },
       orderBy: { createdAt: 'asc' },
     });
 
@@ -94,21 +109,35 @@ export class TaskListsPrismaRepository implements TaskListsRepository {
       taskListId: string;
       label: string;
       requiresValidation: boolean;
+      taskChecks?: {
+        checkedAt: Date;
+        employee: { firstName: string; lastName: string };
+      }[];
     }[];
   }): TaskList {
     return new TaskList({
       id: row.id,
       restaurantId: row.restaurantId,
       name: row.name,
-      tasks: row.tasks.map(
-        (task) =>
-          new Task({
-            id: task.id,
-            taskListId: task.taskListId,
-            label: task.label,
-            requiresValidation: task.requiresValidation,
-          }),
-      ),
+      tasks: row.tasks.map((task) => {
+        const taskCheck = task.taskChecks?.[0];
+
+        return new Task({
+          id: task.id,
+          taskListId: task.taskListId,
+          label: task.label,
+          requiresValidation: task.requiresValidation,
+          todayCheck: task.taskChecks
+            ? taskCheck
+              ? {
+                  employeeFirstName: taskCheck.employee.firstName,
+                  employeeLastName: taskCheck.employee.lastName,
+                  checkedAt: taskCheck.checkedAt,
+                }
+              : null
+            : undefined,
+        });
+      }),
     });
   }
 }

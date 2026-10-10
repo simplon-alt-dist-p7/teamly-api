@@ -12,6 +12,7 @@ import {
   RESTAURANTS_REPOSITORY,
   RestaurantsRepository,
 } from 'src/restaurant/data-access/restaurants.repository';
+import { getCalendarDay } from 'src/task/domain/services/get-calendar-day';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { getAccessToken } from 'test/utils/get-access-token';
@@ -20,7 +21,16 @@ type MyTaskListResponseBody = {
   id: string;
   restaurantId: string;
   name: string;
-  tasks: { id: string; taskListId: string; label: string }[];
+  tasks: {
+    id: string;
+    taskListId: string;
+    label: string;
+    todayCheck: {
+      employeeFirstName: string;
+      employeeLastName: string;
+      checkedAt: string;
+    } | null;
+  }[];
 };
 
 describe('MyTaskListsController GET E2E', () => {
@@ -122,6 +132,54 @@ describe('MyTaskListsController GET E2E', () => {
     expect(taskLists[0].name).toBe('Ouverture');
     expect(taskLists[0].tasks).toHaveLength(1);
     expect(taskLists[0].tasks[0].label).toBe('Allumer la machine à café');
+    expect(taskLists[0].tasks[0].todayCheck).toBeNull();
+  });
+
+  it('GET /task-lists/me returns who checked the task today', async () => {
+    const restaurant = await createRestaurant('owner@test.com');
+    const employeeUser = await authService.createUser({
+      email: 'alice@test.com',
+      password: 'password123',
+      role: Role.EMPLOYEE,
+    });
+    const employee = await employeesRepository.create({
+      userId: employeeUser.id,
+      restaurantId: restaurant.id,
+      firstName: 'Alice',
+      lastName: 'Martin',
+    });
+    const taskList = await prisma.taskList.create({
+      data: { name: 'Ouverture', restaurantId: restaurant.id },
+    });
+    const task = await prisma.task.create({
+      data: { label: 'Allumer la machine à café', taskListId: taskList.id },
+    });
+    const checkedAt = new Date('2026-10-10T07:12:00.000Z');
+    await prisma.taskCheck.create({
+      data: {
+        taskId: task.id,
+        employeeId: employee.id,
+        day: getCalendarDay(new Date(), 'Europe/Paris'),
+        checkedAt,
+      },
+    });
+    const accessToken = await getAccessToken(
+      'alice@test.com',
+      'password123',
+      app,
+    );
+
+    const response = await request(app.getHttpServer())
+      .get('/task-lists/me')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .expect(200);
+
+    const taskLists = response.body as MyTaskListResponseBody[];
+    expect(taskLists[0].tasks[0].todayCheck).toEqual({
+      employeeFirstName: 'Alice',
+      employeeLastName: 'Martin',
+      checkedAt: checkedAt.toISOString(),
+    });
   });
 
   it('GET /task-lists/me returns 404 when the user is not an employee', async () => {

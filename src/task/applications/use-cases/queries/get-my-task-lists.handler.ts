@@ -7,6 +7,7 @@ import {
   type TaskListsRepository,
 } from 'src/task/data-access/task-lists.repository';
 import { TaskList } from 'src/task/domain/models/task-list.entity';
+import { getCalendarDay } from 'src/task/domain/services/get-calendar-day';
 import { GetMyTaskListsQuery } from './get-my-task-lists.query';
 
 @QueryHandler(GetMyTaskListsQuery)
@@ -30,6 +31,11 @@ export class GetMyTaskListsHandler implements IQueryHandler<
       throw new NotFoundException('Employé introuvable');
     }
 
-    return this.taskListsRepository.findByRestaurantId(employee.restaurantId);
+    const day = getCalendarDay(new Date(), 'Europe/Paris');
+
+    return this.taskListsRepository.findByRestaurantId(
+      employee.restaurantId,
+      day,
+    );
   }
 }

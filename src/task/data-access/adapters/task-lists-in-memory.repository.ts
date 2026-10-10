@@ -17,8 +17,47 @@ export class TaskListsInMemoryRepository implements TaskListsRepository {
     return this.taskLists.find((list) => list.id === id) ?? null;
   }
 
-  async findByRestaurantId(restaurantId: string): Promise<TaskList[]> {
-    return this.taskLists.filter((list) => list.restaurantId === restaurantId);
+  async findByRestaurantId(
+    restaurantId: string,
+    day?: Date,
+  ): Promise<TaskList[]> {
+    const taskLists = this.taskLists.filter(
+      (taskList) => taskList.restaurantId === restaurantId,
+    );
+
+    if (!day) {
+      return taskLists;
+    }
+
+    return taskLists.map(
+      (taskList) =>
+        new TaskList({
+          id: taskList.id,
+          restaurantId: taskList.restaurantId,
+          name: taskList.name,
+          tasks: taskList.tasks.map((task) => {
+            const taskCheck = this.taskChecks.find(
+              (check) =>
+                check.taskId === task.id &&
+                check.day.getTime() === day.getTime(),
+            );
+
+            return new Task({
+              id: task.id,
+              taskListId: task.taskListId,
+              label: task.label,
+              requiresValidation: task.requiresValidation,
+              todayCheck: taskCheck
+                ? {
+                    employeeFirstName: '',
+                    employeeLastName: '',
+                    checkedAt: taskCheck.checkedAt,
+                  }
+                : null,
+            });
+          }),
+        }),
+    );
   }
 
   async addTask(task: Task): Promise<void> {
