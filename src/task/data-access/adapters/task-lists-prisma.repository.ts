@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
+import { TaskCheck } from 'src/task/domain/models/task-check.entity';
 import { TaskList } from '../../domain/models/task-list.entity';
 import { Task } from '../../domain/models/task.entity';
 import { TaskListsRepository } from '../task-lists.repository';
@@ -51,6 +52,36 @@ export class TaskListsPrismaRepository implements TaskListsRepository {
   async removeTask(taskId: string): Promise<void> {
     await this.prisma.task.delete({
       where: { id: taskId },
+    });
+  }
+
+  async findTaskCheck(taskId: string, day: Date): Promise<TaskCheck | null> {
+    const row = await this.prisma.taskCheck.findUnique({
+      where: { taskId_day: { taskId, day } },
+    });
+
+    if (!row) {
+      return null;
+    }
+
+    return new TaskCheck({
+      id: row.id,
+      taskId: row.taskId,
+      employeeId: row.employeeId,
+      day: row.day,
+      checkedAt: row.checkedAt,
+    });
+  }
+
+  async addTaskCheck(taskCheck: TaskCheck): Promise<void> {
+    await this.prisma.taskCheck.create({
+      data: {
+        id: taskCheck.id,
+        taskId: taskCheck.taskId,
+        employeeId: taskCheck.employeeId,
+        day: taskCheck.day,
+        checkedAt: taskCheck.checkedAt,
+      },
     });
   }
 

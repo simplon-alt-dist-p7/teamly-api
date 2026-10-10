@@ -47,6 +47,7 @@ model Employee {
   leaveRequests LeaveRequest[]
   restaurantId  String
   restaurant    Restaurant     @relation(fields: [restaurantId], references: [id])
+  taskChecks    TaskCheck[]
 }
 
 model Shift {
@@ -81,12 +82,13 @@ model Restaurant {
 }
 
 model Task {
-  id                 String   @id @default(uuid())
+  id                 String      @id @default(uuid())
   label              String
   taskListId         String
-  requiresValidation Boolean  @default(false)
-  taskList           TaskList @relation(fields: [taskListId], references: [id], onDelete: Cascade)
-  createdAt          DateTime @default(now())
+  requiresValidation Boolean     @default(false)
+  taskList           TaskList    @relation(fields: [taskListId], references: [id], onDelete: Cascade)
+  createdAt          DateTime    @default(now())
+  taskChecks         TaskCheck[]
 }
 
 model TaskList {
@@ -96,4 +98,16 @@ model TaskList {
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
   createdAt    DateTime   @default(now())
   tasks        Task[]
+}
+
+model TaskCheck {
+  id         String   @id @default(uuid())
+  taskId     String
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  employeeId String
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  day        DateTime @db.Date
+  checkedAt  DateTime @default(now())
+
+  @@unique([taskId, day])
 }

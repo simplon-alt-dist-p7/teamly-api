@@ -1,3 +1,4 @@
+import { TaskCheck } from '../domain/models/task-check.entity';
 import { TaskList } from '../domain/models/task-list.entity';
 import { Task } from '../domain/models/task.entity';
 
@@ -7,6 +8,9 @@ export interface TaskListsRepository {
   findByRestaurantId(restaurantId: string): Promise<TaskList[]>;
   addTask(task: Task): Promise<void>;
   removeTask(taskId: string): Promise<void>;
+
+  findTaskCheck(taskId: string, day: Date): Promise<TaskCheck | null>;
+  addTaskCheck(taskCheck: TaskCheck): Promise<void>;
 }
 
 export const TASK_LISTS_REPOSITORY = Symbol('TASK_LISTS_REPOSITORY');

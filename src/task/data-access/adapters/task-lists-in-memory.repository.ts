@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { TaskCheck } from '../../domain/models/task-check.entity';
 import { TaskList } from '../../domain/models/task-list.entity';
 import { Task } from '../../domain/models/task.entity';
 import { TaskListsRepository } from '../task-lists.repository';
@@ -6,6 +7,7 @@ import { TaskListsRepository } from '../task-lists.repository';
 @Injectable()
 export class TaskListsInMemoryRepository implements TaskListsRepository {
   taskLists: TaskList[] = [];
+  taskChecks: TaskCheck[] = [];
 
   async save(taskList: TaskList): Promise<void> {
     this.taskLists.push(taskList);
@@ -31,5 +33,19 @@ export class TaskListsInMemoryRepository implements TaskListsRepository {
         taskList.tasks.splice(index, 1);
       }
     }
+  }
+
+  async findTaskCheck(taskId: string, day: Date): Promise<TaskCheck | null> {
+    return (
+      this.taskChecks.find(
+        (taskCheck) =>
+          taskCheck.taskId === taskId &&
+          taskCheck.day.getTime() === day.getTime(),
+      ) ?? null
+    );
+  }
+
+  async addTaskCheck(taskCheck: TaskCheck): Promise<void> {
+    this.taskChecks.push(taskCheck);
   }
 }
