@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { Restaurant } from '@prisma/client';
 import { PrismaService } from 'prisma/prisma.service';
 import { CreateRestaurantRequest } from '../../dtos/request/create-restaurant-dto';
-import { RestaurantsRepository } from '../restaurants.repository';
+import {
+  RestaurantOwnerRecord,
+  RestaurantsRepository,
+} from '../restaurants.repository';
 
 @Injectable()
 export class RestaurantsPrismaRepository implements RestaurantsRepository {
@@ -10,6 +13,18 @@ export class RestaurantsPrismaRepository implements RestaurantsRepository {
 
   async findByOwnerId(ownerId: string): Promise<Restaurant[]> {
     return this.prisma.restaurant.findMany({ where: { ownerId } });
+  }
+
+  async findAll(): Promise<RestaurantOwnerRecord[]> {
+    const rows = await this.prisma.restaurant.findMany({
+      include: { owner: { select: { email: true } } },
+    });
+
+    return rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      ownerEmail: row.owner.email,
+    }));
   }
 
   async create(
