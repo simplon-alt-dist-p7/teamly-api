@@ -2,7 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { Restaurant } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import { CreateRestaurantRequest } from '../../dtos/request/create-restaurant-dto';
-import { RestaurantsRepository } from '../restaurants.repository';
+import {
+  RestaurantOwnerRecord,
+  RestaurantsRepository,
+} from '../restaurants.repository';
 
 @Injectable()
 export class RestaurantsInMemoryRepository implements RestaurantsRepository {
@@ -35,5 +38,13 @@ export class RestaurantsInMemoryRepository implements RestaurantsRepository {
     return this.restaurants.filter(
       (restaurant) => restaurant.ownerId === ownerId,
     );
+  }
+
+  async findAll(): Promise<RestaurantOwnerRecord[]> {
+    return this.restaurants.map((restaurant) => ({
+      id: restaurant.id,
+      name: restaurant.name,
+      ownerEmail: restaurant.email,
+    }));
   }
 }
