@@ -22,10 +22,12 @@ export class Task {
   readonly todayCheck?: TodayCheck | null;
 
   constructor(props: TaskProps) {
-    const label = props.label.trim();
-    if (label === '') {
+    const trimmedLabel = props.label.trim();
+    if (trimmedLabel === '') {
       throw new EmptyTaskLabelError();
     }
+
+    const label = trimmedLabel.charAt(0).toUpperCase() + trimmedLabel.slice(1);
 
     this.id = props.id;
     this.taskListId = props.taskListId;

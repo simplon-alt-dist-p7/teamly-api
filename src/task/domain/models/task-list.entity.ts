@@ -15,10 +15,12 @@ export class TaskList {
   readonly tasks: Task[];
 
   constructor(props: TaskListProps) {
-    const name = props.name.trim();
-    if (name === '') {
+    const trimmedName = props.name.trim();
+    if (trimmedName === '') {
       throw new EmptyTaskListNameError();
     }
+
+    const name = trimmedName.charAt(0).toUpperCase() + trimmedName.slice(1);
 
     this.id = props.id;
     this.restaurantId = props.restaurantId;

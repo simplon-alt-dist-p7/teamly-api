@@ -65,6 +65,23 @@ describe('CreateTaskListHandler', () => {
     expect(taskListsRepository.taskLists).toEqual([result]);
   });
 
+  it('capitalizes the first letter of the name', async () => {
+    const restaurant = await restaurantsRepository.create(
+      validRestaurantData,
+      ownerId,
+    );
+
+    const result = await handler.execute(
+      new CreateTaskListCommand({
+        restaurantId: restaurant.id,
+        name: 'ouverture',
+        ownerId,
+      }),
+    );
+
+    expect(result.name).toBe('Ouverture');
+  });
+
   it('throws NotFoundException if the restaurant does not exist', async () => {
     const command = new CreateTaskListCommand({
       restaurantId: 'unknown-restaurant',

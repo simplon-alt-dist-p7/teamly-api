@@ -82,6 +82,22 @@ describe('AddTaskHandler', () => {
     expect(taskListsRepository.taskLists[0].tasks).toEqual([result]);
   });
 
+  it('capitalizes the first letter of the label', async () => {
+    const restaurant = await createRestaurantWithTaskList();
+
+    const result = await handler.execute(
+      new AddTaskCommand({
+        restaurantId: restaurant.id,
+        taskListId: 'list-1',
+        label: 'allumer la machine à café',
+        ownerId,
+        requiresValidation: false,
+      }),
+    );
+
+    expect(result.label).toBe('Allumer la machine à café');
+  });
+
   it('throws NotFoundException if the restaurant does not exist', async () => {
     const command = new AddTaskCommand({
       restaurantId: 'unknown-restaurant',
