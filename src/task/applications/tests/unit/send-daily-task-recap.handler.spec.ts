@@ -99,7 +99,7 @@ describe('SendDailyTaskRecapHandler', () => {
     expect(send).toHaveBeenCalledTimes(1);
     const message = send.mock.calls[0][0];
     expect(message.to).toBe('owner@test.com');
-    expect(message.subject).toBe('Tâches du Dimanche 11 octobre');
+    expect(message.subject).toBe('Tâches du dimanche 11 octobre 2026');
     expect(message.text).toContain('Allumer la machine à café : faite par');
     expect(message.text).toContain('09:12');
     expect(message.text).not.toContain('Sortir les chaises');
