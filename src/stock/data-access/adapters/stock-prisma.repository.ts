@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { Product } from '../../domain/models/product.entity';
 import { Supplier } from '../../domain/models/supplier.entity';
-import { StockRepository } from '../stock.repository';
+import { StockRepository, StockSending } from '../stock.repository';
 
 @Injectable()
 export class StockPrismaRepository implements StockRepository {
@@ -43,19 +43,44 @@ export class StockPrismaRepository implements StockRepository {
       where: { supplier: { restaurantId } },
     });
 
-    return rows.map(
-      (row) =>
-        new Product({
-          id: row.id,
-          name: row.name,
-          unit: row.unit,
-          minQuantity: row.minQuantity,
-          quantity: row.quantity,
-          countedAt: row.countedAt,
-          supplierId: row.supplierId,
-          createdAt: row.createdAt,
-        }),
-    );
+    return rows.map((row) => this.toProduct(row));
+  }
+
+  async findProductById(productId: string): Promise<Product | null> {
+    const row = await this.prisma.product.findUnique({
+      where: { id: productId },
+    });
+
+    return row ? this.toProduct(row) : null;
+  }
+
+  async updateProductCount(product: Product): Promise<void> {
+    await this.prisma.product.update({
+      where: { id: product.id },
+      data: { quantity: product.quantity, countedAt: product.countedAt },
+    });
+  }
+
+  async findStockSending(restaurantId: string): Promise<StockSending> {
+    const row = await this.prisma.restaurant.findUnique({
+      where: { id: restaurantId },
+      select: { stockSentAt: true, stockSentBy: true },
+    });
+
+    return {
+      sentAt: row?.stockSentAt ?? null,
+      sentBy: row?.stockSentBy ?? null,
+    };
+  }
+
+  async saveStockSending(
+    restaurantId: string,
+    sending: StockSending,
+  ): Promise<void> {
+    await this.prisma.restaurant.update({
+      where: { id: restaurantId },
+      data: { stockSentAt: sending.sentAt, stockSentBy: sending.sentBy },
+    });
   }
 
   async createSupplier(supplier: Supplier): Promise<void> {
@@ -83,6 +108,28 @@ export class StockPrismaRepository implements StockRepository {
         supplierId: product.supplierId,
         createdAt: product.createdAt,
       },
+    });
+  }
+
+  private toProduct(row: {
+    id: string;
+    name: string;
+    unit: string;
+    minQuantity: number;
+    quantity: number;
+    countedAt: Date | null;
+    supplierId: string;
+    createdAt: Date;
+  }): Product {
+    return new Product({
+      id: row.id,
+      name: row.name,
+      unit: row.unit,
+      minQuantity: row.minQuantity,
+      quantity: row.quantity,
+      countedAt: row.countedAt,
+      supplierId: row.supplierId,
+      createdAt: row.createdAt,
     });
   }
 
