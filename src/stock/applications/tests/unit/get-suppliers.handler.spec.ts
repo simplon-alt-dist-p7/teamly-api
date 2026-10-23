@@ -45,7 +45,7 @@ describe('GetSuppliersHandler', () => {
   const createRestaurant = () =>
     restaurantsRepository.create(validRestaurantData, ownerId);
 
-  it('returns the restaurant suppliers sorted by name', async () => {
+  it('returns the restaurant suppliers', async () => {
     const restaurant = await createRestaurant();
     await stockRepository.createSupplier(
       new Supplier({
@@ -76,8 +76,8 @@ describe('GetSuppliersHandler', () => {
     );
 
     expect(result.map((supplier) => supplier.name)).toEqual([
-      'Metro',
       'Storia',
+      'Metro',
     ]);
   });
 

@@ -30,9 +30,19 @@ export class StockInMemoryRepository implements StockRepository {
   }
 
   async findSuppliersByRestaurantId(restaurantId: string): Promise<Supplier[]> {
-    return this.suppliers
+    return this.suppliers.filter(
+      (supplier) => supplier.restaurantId === restaurantId,
+    );
+  }
+
+  async findProductsByRestaurantId(restaurantId: string): Promise<Product[]> {
+    const supplierIds = this.suppliers
       .filter((supplier) => supplier.restaurantId === restaurantId)
-      .sort((a, b) => a.name.localeCompare(b.name));
+      .map((supplier) => supplier.id);
+
+    return this.products.filter((product) =>
+      supplierIds.includes(product.supplierId),
+    );
   }
 
   async createSupplier(supplier: Supplier): Promise<void> {
