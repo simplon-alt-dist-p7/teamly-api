@@ -8,6 +8,7 @@ export interface StockRepository {
     name: string,
   ): Promise<Supplier | null>;
   findSuppliersByRestaurantId(restaurantId: string): Promise<Supplier[]>;
+  findProductsByRestaurantId(restaurantId: string): Promise<Product[]>;
   createSupplier(supplier: Supplier): Promise<void>;
   createProduct(product: Product): Promise<void>;
 }
