@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Product } from '../../domain/models/product.entity';
 import { Supplier } from '../../domain/models/supplier.entity';
-import { StockRepository } from '../stock.repository';
+import { StockRepository, StockSending } from '../stock.repository';
 
 @Injectable()
 export class StockInMemoryRepository implements StockRepository {
   suppliers: Supplier[] = [];
   products: Product[] = [];
+  sendings = new Map<string, StockSending>();
 
   async findSupplierById(supplierId: string): Promise<Supplier | null> {
     return (
@@ -51,5 +52,26 @@ export class StockInMemoryRepository implements StockRepository {
 
   async createProduct(product: Product): Promise<void> {
     this.products.push(product);
+  }
+
+  async findProductById(productId: string): Promise<Product | null> {
+    return this.products.find((product) => product.id === productId) ?? null;
+  }
+
+  async updateProductCount(product: Product): Promise<void> {
+    this.products = this.products.map((current) =>
+      current.id === product.id ? product : current,
+    );
+  }
+
+  async findStockSending(restaurantId: string): Promise<StockSending> {
+    return this.sendings.get(restaurantId) ?? { sentAt: null, sentBy: null };
+  }
+
+  async saveStockSending(
+    restaurantId: string,
+    sending: StockSending,
+  ): Promise<void> {
+    this.sendings.set(restaurantId, sending);
   }
 }

@@ -81,6 +81,7 @@ model Restaurant {
   taskLists   TaskList[]
   suppliers   Supplier[]
   stockSentAt DateTime?
+  stockSentBy String?
 }
 
 model Task {
