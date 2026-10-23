@@ -33,6 +33,7 @@ export class StockPrismaRepository implements StockRepository {
   async findSuppliersByRestaurantId(restaurantId: string): Promise<Supplier[]> {
     const rows = await this.prisma.supplier.findMany({
       where: { restaurantId },
+      orderBy: { name: 'asc' },
     });
 
     return rows.map((row) => this.toDomain(row));
@@ -41,6 +42,7 @@ export class StockPrismaRepository implements StockRepository {
   async findProductsByRestaurantId(restaurantId: string): Promise<Product[]> {
     const rows = await this.prisma.product.findMany({
       where: { supplier: { restaurantId } },
+      orderBy: { name: 'asc' },
     });
 
     return rows.map((row) => this.toProduct(row));
