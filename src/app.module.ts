@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { EmployeeModule } from './employee/employee.module';
 import { RestaurantModule } from './restaurant/restaurant.module';
 import { ShiftModule } from './shift/shift.module';
+import { StockModule } from './stock/stock.module';
 import { TaskModule } from './task/task.module';
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { TaskModule } from './task/task.module';
     EmployeeModule,
     ShiftModule,
     TaskModule,
+    StockModule,
   ],
   controllers: [AppController],
   providers: [AppService],
