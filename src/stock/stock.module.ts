@@ -7,6 +7,7 @@ import { CountProductHandler } from './applications/use-cases/commands/count-pro
 import { CreateProductHandler } from './applications/use-cases/commands/create-product/create-product.handler';
 import { CreateSupplierHandler } from './applications/use-cases/commands/create-supplier/create-supplier.handler';
 import { SendStockHandler } from './applications/use-cases/commands/send-stock/send-stock.handler';
+import { UpdateProductHandler } from './applications/use-cases/commands/update-product/update-product.handler';
 import { GetMyStockHandler } from './applications/use-cases/queries/get-my-stock/get-my-stock.handler';
 import { GetProductsHandler } from './applications/use-cases/queries/get-products/get-products.handler';
 import { GetSuppliersHandler } from './applications/use-cases/queries/get-suppliers/get-suppliers.handler';
@@ -23,6 +24,7 @@ import { SupplierController } from './presentation/controller/supplier.controlle
     CreateSupplierHandler,
     GetSuppliersHandler,
     CreateProductHandler,
+    UpdateProductHandler,
     GetProductsHandler,
     GetMyStockHandler,
     CountProductHandler,

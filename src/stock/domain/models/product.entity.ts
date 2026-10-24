@@ -16,6 +16,12 @@ export type ProductProps = {
   readonly createdAt: Date;
 };
 
+export type ProductDetails = {
+  readonly name: string;
+  readonly unit: string;
+  readonly minQuantity: number;
+};
+
 export class Product {
   readonly id: string;
   readonly name: string;
@@ -61,6 +67,20 @@ export class Product {
       return true;
     }
     return this.countedAt > stockSentAt;
+  }
+
+  // The owner changes the details; the last count stays as it is.
+  update(details: ProductDetails): Product {
+    return new Product({
+      id: this.id,
+      name: details.name,
+      unit: details.unit,
+      minQuantity: details.minQuantity,
+      quantity: this.quantity,
+      countedAt: this.countedAt,
+      supplierId: this.supplierId,
+      createdAt: this.createdAt,
+    });
   }
 
   count(quantity: number, countedAt: Date): Product {

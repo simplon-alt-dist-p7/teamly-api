@@ -56,6 +56,17 @@ export class StockPrismaRepository implements StockRepository {
     return row ? this.toProduct(row) : null;
   }
 
+  async updateProduct(product: Product): Promise<void> {
+    await this.prisma.product.update({
+      where: { id: product.id },
+      data: {
+        name: product.name,
+        unit: product.unit,
+        minQuantity: product.minQuantity,
+      },
+    });
+  }
+
   async updateProductCount(product: Product): Promise<void> {
     await this.prisma.product.update({
       where: { id: product.id },
