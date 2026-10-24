@@ -14,6 +14,7 @@ import { CountProductCommand } from 'src/stock/applications/use-cases/commands/c
 import { SendStockCommand } from 'src/stock/applications/use-cases/commands/send-stock/send-stock.command';
 import { GetMyStockQuery } from 'src/stock/applications/use-cases/queries/get-my-stock/get-my-stock.query';
 import { CountProductDto } from '../dto/request/count-product.dto';
+import { SendStockDto } from '../dto/request/send-stock.dto';
 
 // Employee side: the evening stock count of the employee's restaurant.
 @Controller('stock/me')
@@ -47,9 +48,9 @@ export class MyStockController {
 
   @UseGuards(AuthGuard)
   @Post('send')
-  send(@Req() req: AuthenticatedRequest) {
+  send(@Req() req: AuthenticatedRequest, @Body() dto: SendStockDto) {
     return this.commandBus.execute(
-      new SendStockCommand({ userId: req.user.sub }),
+      new SendStockCommand({ userId: req.user.sub, counts: dto.counts }),
     );
   }
 }

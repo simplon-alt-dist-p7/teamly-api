@@ -202,26 +202,49 @@ describe('My stock (evening count)', () => {
   });
 
   describe('SendStockHandler', () => {
-    it('records who sent the list and unchecks the products for the next list', async () => {
+    it('saves all the counted quantities in one sending', async () => {
       const restaurant = await createRestaurant();
       await createEmployee(restaurant.id);
       await createSupplier('storia', restaurant.id);
       await createProduct('Burrata', 'storia', 8);
-      await countProduct.execute(
-        new CountProductCommand({
-          userId: 'user-1',
-          productId: 'product-Burrata',
-          quantity: 5,
-        }),
-      );
-      await new Promise((resolve) => setTimeout(resolve, 2));
+      await createProduct('Gorgonzola', 'storia', 2);
+      await createProduct('Ricotta', 'storia', 3);
 
       const sending = await sendStock.execute(
-        new SendStockCommand({ userId: 'user-1' }),
+        new SendStockCommand({
+          userId: 'user-1',
+          counts: [
+            { productId: 'product-Burrata', quantity: 5 },
+            { productId: 'product-Gorgonzola', quantity: 0 },
+          ],
+        }),
       );
 
       expect(sending.sentBy).toBe('Inès');
       expect(sending.sentAt).toBeInstanceOf(Date);
+      const burrata = await stockRepository.findProductById('product-Burrata');
+      const gorgonzola =
+        await stockRepository.findProductById('product-Gorgonzola');
+      const ricotta = await stockRepository.findProductById('product-Ricotta');
+      expect(burrata?.quantity).toBe(5);
+      expect(gorgonzola?.quantity).toBe(0);
+      expect(ricotta?.quantity).toBe(3);
+      expect(ricotta?.countedAt).toBeNull();
+    });
+
+    it('starts the next list with every product unchecked', async () => {
+      const restaurant = await createRestaurant();
+      await createEmployee(restaurant.id);
+      await createSupplier('storia', restaurant.id);
+      await createProduct('Burrata', 'storia', 8);
+
+      await sendStock.execute(
+        new SendStockCommand({
+          userId: 'user-1',
+          counts: [{ productId: 'product-Burrata', quantity: 5 }],
+        }),
+      );
+
       const stock = await getMyStock.execute(
         new GetMyStockQuery({ userId: 'user-1' }),
       );
@@ -232,9 +255,38 @@ describe('My stock (evening count)', () => {
       });
     });
 
+    it('saves nothing if a product belongs to another restaurant', async () => {
+      const restaurant = await createRestaurant();
+      const other = await createRestaurant();
+      await createEmployee(restaurant.id);
+      await createSupplier('storia', restaurant.id);
+      await createSupplier('elsewhere', other.id);
+      await createProduct('Burrata', 'storia', 8);
+      await createProduct('Ricotta', 'elsewhere', 3);
+
+      await expect(
+        sendStock.execute(
+          new SendStockCommand({
+            userId: 'user-1',
+            counts: [
+              { productId: 'product-Burrata', quantity: 5 },
+              { productId: 'product-Ricotta', quantity: 0 },
+            ],
+          }),
+        ),
+      ).rejects.toThrow(NotFoundException);
+
+      const burrata = await stockRepository.findProductById('product-Burrata');
+      expect(burrata?.quantity).toBe(8);
+      const sending = await stockRepository.findStockSending(restaurant.id);
+      expect(sending.sentAt).toBeNull();
+    });
+
     it('throws NotFoundException if the user has no employee', async () => {
       await expect(
-        sendStock.execute(new SendStockCommand({ userId: 'owner-1' })),
+        sendStock.execute(
+          new SendStockCommand({ userId: 'owner-1', counts: [] }),
+        ),
       ).rejects.toThrow(NotFoundException);
     });
   });
