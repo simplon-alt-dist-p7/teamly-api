@@ -17,6 +17,7 @@ export interface StockRepository {
   createSupplier(supplier: Supplier): Promise<void>;
   createProduct(product: Product): Promise<void>;
   findProductById(productId: string): Promise<Product | null>;
+  updateProduct(product: Product): Promise<void>;
   updateProductCount(product: Product): Promise<void>;
   findStockSending(restaurantId: string): Promise<StockSending>;
   saveStockSending(restaurantId: string, sending: StockSending): Promise<void>;

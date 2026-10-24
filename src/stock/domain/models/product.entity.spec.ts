@@ -170,4 +170,34 @@ describe('Product', () => {
 
     expect(() => product.count(-1, new Date())).toThrow(NegativeQuantityError);
   });
+
+  describe('update', () => {
+    it('changes the details and keeps the last count', () => {
+      const countedAt = new Date('2026-10-23T22:00:00');
+      const product = new Product({ ...farine, quantity: 4, countedAt });
+
+      const updated = product.update({
+        name: 'farine 00',
+        unit: 'Sacs',
+        minQuantity: 3,
+      });
+
+      expect(updated).toMatchObject({
+        id: 'product-1',
+        name: 'Farine 00',
+        unit: 'sacs',
+        minQuantity: 3,
+        quantity: 4,
+        countedAt,
+      });
+    });
+
+    it('rejects a negative minQuantity', () => {
+      const product = new Product(farine);
+
+      expect(() =>
+        product.update({ name: 'Farine', unit: 'kg', minQuantity: -1 }),
+      ).toThrow(NegativeMinQuantityError);
+    });
+  });
 });

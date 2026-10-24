@@ -58,6 +58,12 @@ export class StockInMemoryRepository implements StockRepository {
     return this.products.find((product) => product.id === productId) ?? null;
   }
 
+  async updateProduct(product: Product): Promise<void> {
+    this.products = this.products.map((current) =>
+      current.id === product.id ? product : current,
+    );
+  }
+
   async updateProductCount(product: Product): Promise<void> {
     this.products = this.products.map((current) =>
       current.id === product.id ? product : current,
