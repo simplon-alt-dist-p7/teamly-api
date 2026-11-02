@@ -8,6 +8,10 @@ import {
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import type { EmployeesRepository } from 'src/employee/data-access/employees.repository';
 import { EMPLOYEES_REPOSITORY } from 'src/employee/data-access/employees.repository';
+import {
+  LEAVE_REQUEST_REPOSITORY,
+  type LeaveRequestRepository,
+} from 'src/leave-request/data-access/leave-requests.repository';
 import type { RestaurantsRepository } from 'src/restaurant/data-access/restaurants.repository';
 import { RESTAURANTS_REPOSITORY } from 'src/restaurant/data-access/restaurants.repository';
 import {
@@ -17,6 +21,7 @@ import {
 import { InvalidTimeRangeError } from 'src/shift/domain/errors/time-range.errors';
 import { Shift } from 'src/shift/domain/models/shift.entity';
 import { TimeRange } from 'src/shift/domain/value-objects/timeRange';
+import { ensureEmployeeNotOnLeave } from '../ensure-employee-not-on-leave';
 import { UpdateShiftCommand } from './update-shift.command';
 
 @CommandHandler(UpdateShiftCommand)
@@ -31,6 +36,8 @@ export class UpdateShiftHandler implements ICommandHandler<
     private readonly employeesRepository: EmployeesRepository,
     @Inject(RESTAURANTS_REPOSITORY)
     private readonly restaurantsRepository: RestaurantsRepository,
+    @Inject(LEAVE_REQUEST_REPOSITORY)
+    private readonly leaveRequestsRepository: LeaveRequestRepository,
   ) {}
 
   async execute(command: UpdateShiftCommand): Promise<Shift> {
@@ -69,6 +76,12 @@ export class UpdateShiftHandler implements ICommandHandler<
       }
       throw error;
     }
+    await ensureEmployeeNotOnLeave(
+      employee,
+      timeRange.startTime,
+      this.leaveRequestsRepository,
+    );
+
     const updatedShift = shift.cloneWithNewTimeRange(timeRange);
 
     const existing = await this.shiftsRepository.findByEmployeeId(

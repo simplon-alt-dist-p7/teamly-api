@@ -8,6 +8,8 @@ import { EMPLOYEES_REPOSITORY } from 'src/employee/data-access/employees.reposit
 import { RestaurantsInMemoryRepository } from 'src/restaurant/data-access/adapters/restaurants-in-memory.repository';
 import { RESTAURANTS_REPOSITORY } from 'src/restaurant/data-access/restaurants.repository';
 import { ShiftsInMemoryRepository } from 'src/shift/data-access/adapters/shifts-in-memory.repository';
+import { LeaveRequestsInMemoryRepository } from 'src/leave-request/data-access/adapters/leave-requests-in-memory.repository';
+import { LEAVE_REQUEST_REPOSITORY } from 'src/leave-request/data-access/leave-requests.repository';
 import { SHIFT_REPOSITORY } from 'src/shift/data-access/shifts.repository';
 import { CreateShiftCommand } from '../../use-cases/commands/create-shift/create-shift.command';
 import { CreateShiftHandler } from '../../use-cases/commands/create-shift/create-shift.handler';
@@ -28,6 +30,10 @@ describe('DuplicateWeekHandler', () => {
         DuplicateWeekHandler,
         CreateShiftHandler,
         { provide: SHIFT_REPOSITORY, useClass: ShiftsInMemoryRepository },
+        {
+          provide: LEAVE_REQUEST_REPOSITORY,
+          useClass: LeaveRequestsInMemoryRepository,
+        },
         {
           provide: EMPLOYEES_REPOSITORY,
           useClass: EmployeesInMemoryRepository,

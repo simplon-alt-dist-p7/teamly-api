@@ -16,7 +16,10 @@ import { CreateShiftCommand } from '../create-shift/create-shift.command';
 import { DuplicateWeekCommand } from './duplicate-shift.command';
 
 @CommandHandler(DuplicateWeekCommand)
-export class DuplicateWeekHandler implements ICommandHandler<DuplicateWeekCommand> {
+export class DuplicateWeekHandler implements ICommandHandler<
+  DuplicateWeekCommand,
+  { skipped: number }
+> {
   constructor(
     @Inject(SHIFT_REPOSITORY)
     private readonly shiftsRepository: ShiftRepository,
@@ -51,6 +54,7 @@ export class DuplicateWeekHandler implements ICommandHandler<DuplicateWeekComman
       }),
     );
 
+    let skipped = 0;
     for (const shift of weekShifts) {
       try {
         await this.commandBus.execute(
@@ -63,10 +67,12 @@ export class DuplicateWeekHandler implements ICommandHandler<DuplicateWeekComman
         );
       } catch (error) {
         if (error instanceof ConflictException) {
+          skipped++;
           continue;
         }
         throw error;
       }
     }
+    return { skipped };
   }
 }
