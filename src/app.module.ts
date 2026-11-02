@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { EmployeeModule } from './employee/employee.module';
+import { LeaveRequestModule } from './leave-request/leave-request.module';
 import { RestaurantModule } from './restaurant/restaurant.module';
 import { ShiftModule } from './shift/shift.module';
 import { StockModule } from './stock/stock.module';
@@ -17,6 +18,7 @@ import { TaskModule } from './task/task.module';
     ShiftModule,
     TaskModule,
     StockModule,
+    LeaveRequestModule,
   ],
   controllers: [AppController],
   providers: [AppService],
