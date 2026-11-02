@@ -4,7 +4,10 @@ import {
   LeaveRequest,
   LeaveStatus,
 } from '../../domain/models/leave-request.entity';
-import { LeaveRequestRepository } from '../leave-requests.repository';
+import {
+  LeaveRequestRepository,
+  TeamLeaveRequest,
+} from '../leave-requests.repository';
 
 @Injectable()
 export class LeaveRequestsPrismaRepository implements LeaveRequestRepository {
@@ -28,9 +31,26 @@ export class LeaveRequestsPrismaRepository implements LeaveRequestRepository {
   async findByEmployeeId(employeeId: string): Promise<LeaveRequest[]> {
     const rows = await this.prisma.leaveRequest.findMany({
       where: { employeeId },
+      orderBy: { startDate: 'desc' },
     });
 
     return rows.map((row) => this.toDomain(row));
+  }
+
+  async findByRestaurantId(restaurantId: string): Promise<TeamLeaveRequest[]> {
+    const rows = await this.prisma.leaveRequest.findMany({
+      where: { employee: { restaurantId } },
+      include: {
+        employee: { select: { firstName: true, lastName: true } },
+      },
+      orderBy: { startDate: 'desc' },
+    });
+
+    return rows.map((row) => ({
+      leaveRequest: this.toDomain(row),
+      firstName: row.employee.firstName,
+      lastName: row.employee.lastName,
+    }));
   }
 
   private toDomain(row: {
