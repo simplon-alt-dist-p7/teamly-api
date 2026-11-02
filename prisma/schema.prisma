@@ -66,6 +66,7 @@ model LeaveRequest {
   endDate    DateTime
   status     LeaveStatus @default(PENDING)
   createdAt  DateTime    @default(now())
+  managerNote String?
 }
 
 model Restaurant {

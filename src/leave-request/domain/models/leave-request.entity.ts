@@ -1,4 +1,7 @@
-import { InvalidLeaveDatesError } from '../errors/leave-request.errors';
+import {
+  InvalidLeaveDatesError,
+  LeaveRequestAlreadyDecidedError,
+} from '../errors/leave-request.errors';
 
 export type LeaveStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
@@ -9,6 +12,7 @@ export type LeaveRequestProps = {
   readonly endDate: Date;
   readonly status: LeaveStatus;
   readonly createdAt: Date;
+  readonly managerNote?: string | null;
 };
 
 // Un congé couvre des jours entiers : startDate et endDate sont tous les deux inclus.
@@ -19,6 +23,7 @@ export class LeaveRequest {
   readonly endDate: Date;
   readonly status: LeaveStatus;
   readonly createdAt: Date;
+  readonly managerNote: string | null;
 
   constructor(props: LeaveRequestProps) {
     if (props.endDate < props.startDate) {
@@ -31,9 +36,9 @@ export class LeaveRequest {
     this.endDate = props.endDate;
     this.status = props.status;
     this.createdAt = props.createdAt;
+    this.managerNote = props.managerNote ?? null;
   }
 
-  // Une demande refusée ne bloque plus ses dates.
   overlapsWith(other: LeaveRequest): boolean {
     if (other.status === 'REJECTED') {
       return false;
@@ -43,5 +48,21 @@ export class LeaveRequest {
       this.startDate <= other.endDate &&
       other.startDate <= this.endDate
     );
+  }
+
+  approve(): LeaveRequest {
+    this.ensurePending();
+    return new LeaveRequest({ ...this, status: 'APPROVED' });
+  }
+
+  reject(managerNote: string | null): LeaveRequest {
+    this.ensurePending();
+    return new LeaveRequest({ ...this, status: 'REJECTED', managerNote });
+  }
+
+  private ensurePending() {
+    if (this.status !== 'PENDING') {
+      throw new LeaveRequestAlreadyDecidedError();
+    }
   }
 }

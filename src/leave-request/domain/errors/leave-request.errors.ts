@@ -4,3 +4,10 @@ export class InvalidLeaveDatesError extends Error {
     this.name = 'InvalidLeaveDatesError';
   }
 }
+
+export class LeaveRequestAlreadyDecidedError extends Error {
+  constructor(message = 'Only a pending leave request can be decided') {
+    super(message);
+    this.name = 'LeaveRequestAlreadyDecidedError';
+  }
+}
