@@ -48,6 +48,7 @@ export class GetTeamLeaveRequestsHandler implements IQueryHandler<
       endDate: leaveRequest.endDate,
       status: leaveRequest.status,
       createdAt: leaveRequest.createdAt,
+      managerNote: leaveRequest.managerNote,
     }));
   }
 }

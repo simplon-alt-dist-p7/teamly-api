@@ -27,6 +27,25 @@ export class LeaveRequestsInMemoryRepository implements LeaveRequestRepository {
     return leaveRequest;
   }
 
+  async update(leaveRequest: LeaveRequest): Promise<LeaveRequest> {
+    const existing = this.leaveRequests.find(
+      (saved) => saved.id === leaveRequest.id,
+    );
+    if (!existing) {
+      throw new Error(`LeaveRequest ${leaveRequest.id} not found`);
+    }
+    this.leaveRequests = this.leaveRequests.map((saved) =>
+      saved.id === leaveRequest.id ? leaveRequest : saved,
+    );
+    return leaveRequest;
+  }
+
+  async findById(id: string): Promise<LeaveRequest | null> {
+    return (
+      this.leaveRequests.find((leaveRequest) => leaveRequest.id === id) ?? null
+    );
+  }
+
   async findByEmployeeId(employeeId: string): Promise<LeaveRequest[]> {
     return this.leaveRequests
       .filter((leaveRequest) => leaveRequest.employeeId === employeeId)

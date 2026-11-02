@@ -3,7 +3,9 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { PrismaModule } from 'prisma/prisma.module';
 import { EmployeeModule } from 'src/employee/employee.module';
 import { RestaurantModule } from 'src/restaurant/restaurant.module';
+import { ApproveLeaveRequestHandler } from './applications/use-cases/commands/approve-leave-request/approve-leave-request.handler';
 import { CreateLeaveRequestHandler } from './applications/use-cases/commands/create-leave-request/create-leave-request.handler';
+import { RejectLeaveRequestHandler } from './applications/use-cases/commands/reject-leave-request/reject-leave-request.handler';
 import { GetMyLeaveRequestsHandler } from './applications/use-cases/queries/get-my-leave-requests.handler';
 import { GetTeamLeaveRequestsHandler } from './applications/use-cases/queries/get-team-leave-requests.handler';
 import { LeaveRequestsPrismaRepository } from './data-access/adapters/leave-requests-prisma.repository';
@@ -19,6 +21,8 @@ import { RestaurantLeaveRequestController } from './presentation/controller/rest
       useClass: LeaveRequestsPrismaRepository,
     },
     CreateLeaveRequestHandler,
+    ApproveLeaveRequestHandler,
+    RejectLeaveRequestHandler,
     GetMyLeaveRequestsHandler,
     GetTeamLeaveRequestsHandler,
   ],

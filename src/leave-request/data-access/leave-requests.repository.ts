@@ -9,6 +9,8 @@ export type TeamLeaveRequest = {
 
 export interface LeaveRequestRepository {
   save(leaveRequest: LeaveRequest): Promise<LeaveRequest>;
+  update(leaveRequest: LeaveRequest): Promise<LeaveRequest>;
+  findById(id: string): Promise<LeaveRequest | null>;
   findByEmployeeId(employeeId: string): Promise<LeaveRequest[]>;
   findByRestaurantId(restaurantId: string): Promise<TeamLeaveRequest[]>;
 }

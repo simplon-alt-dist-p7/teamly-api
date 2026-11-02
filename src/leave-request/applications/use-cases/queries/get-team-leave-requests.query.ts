@@ -10,6 +10,7 @@ export type TeamLeaveRequestView = {
   endDate: Date;
   status: LeaveStatus;
   createdAt: Date;
+  managerNote: string | null;
 };
 
 type GetTeamLeaveRequestsProps = {
