@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { PrismaModule } from 'prisma/prisma.module';
 import { EmployeeModule } from 'src/employee/employee.module';
+import { LeaveRequestModule } from 'src/leave-request/leave-request.module';
 import { RestaurantModule } from 'src/restaurant/restaurant.module';
 import { CreateShiftHandler } from './applications/use-cases/commands/create-shift/create-shift.handler';
 import { DeleteShiftHandler } from './applications/use-cases/commands/delete-shift/delete-shift.handler';
@@ -17,7 +18,13 @@ import { ShiftController } from './presentation/controller/shift.controller';
 import { ShiftService } from './shift.service';
 
 @Module({
-  imports: [CqrsModule, PrismaModule, EmployeeModule, RestaurantModule],
+  imports: [
+    CqrsModule,
+    PrismaModule,
+    EmployeeModule,
+    RestaurantModule,
+    LeaveRequestModule,
+  ],
   providers: [
     ShiftService,
     { provide: SHIFT_REPOSITORY, useClass: ShiftsPrismaRepository },

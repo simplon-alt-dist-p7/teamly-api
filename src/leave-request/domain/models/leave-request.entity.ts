@@ -50,6 +50,12 @@ export class LeaveRequest {
     );
   }
 
+  blocksShiftsOn(day: Date): boolean {
+    return (
+      this.status === 'APPROVED' && this.startDate <= day && day <= this.endDate
+    );
+  }
+
   approve(): LeaveRequest {
     this.ensurePending();
     return new LeaveRequest({ ...this, status: 'APPROVED' });

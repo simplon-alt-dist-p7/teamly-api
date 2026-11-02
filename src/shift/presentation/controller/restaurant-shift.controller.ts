@@ -35,7 +35,7 @@ export class RestaurantShiftsController {
     );
   }
 
-  @HttpCode(204)
+  @HttpCode(200)
   @UseGuards(AuthGuard)
   @Post('duplicate-week')
   duplicateWeek(

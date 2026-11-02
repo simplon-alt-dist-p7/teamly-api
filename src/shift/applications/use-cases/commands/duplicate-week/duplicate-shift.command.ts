@@ -5,7 +5,7 @@ type DuplicateWeekCommandProps = {
   readonly referenceDate: Date;
   readonly ownerId: string;
 };
-export class DuplicateWeekCommand extends Command<void> {
+export class DuplicateWeekCommand extends Command<{ skipped: number }> {
   constructor(public readonly props: DuplicateWeekCommandProps) {
     super();
   }

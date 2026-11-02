@@ -42,4 +42,33 @@ describe('LeaveRequest', () => {
       LeaveRequestAlreadyDecidedError,
     );
   });
+
+  describe('blocksShiftsOn', () => {
+    it('a pending leave blocks nothing', () => {
+      expect(leave('PENDING').blocksShiftsOn(new Date('2026-11-13'))).toBe(
+        false,
+      );
+    });
+
+    it('a rejected leave blocks nothing', () => {
+      expect(leave('REJECTED').blocksShiftsOn(new Date('2026-11-13'))).toBe(
+        false,
+      );
+    });
+
+    it('an approved leave blocks shifts from its first day to its last day', () => {
+      const approved = leave('APPROVED');
+
+      expect(approved.blocksShiftsOn(new Date('2026-11-12'))).toBe(true);
+      expect(approved.blocksShiftsOn(new Date('2026-11-13'))).toBe(true);
+      expect(approved.blocksShiftsOn(new Date('2026-11-15'))).toBe(true);
+    });
+
+    it('an approved leave does not block the day before or the day after', () => {
+      const approved = leave('APPROVED');
+
+      expect(approved.blocksShiftsOn(new Date('2026-11-11'))).toBe(false);
+      expect(approved.blocksShiftsOn(new Date('2026-11-16'))).toBe(false);
+    });
+  });
 });

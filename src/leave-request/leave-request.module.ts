@@ -27,5 +27,6 @@ import { RestaurantLeaveRequestController } from './presentation/controller/rest
     GetTeamLeaveRequestsHandler,
   ],
   controllers: [LeaveRequestController, RestaurantLeaveRequestController],
+  exports: [LEAVE_REQUEST_REPOSITORY],
 })
 export class LeaveRequestModule {}

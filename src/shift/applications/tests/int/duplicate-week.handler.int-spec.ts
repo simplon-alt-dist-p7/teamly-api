@@ -20,6 +20,8 @@ import { CreateShiftHandler } from 'src/shift/applications/use-cases/commands/cr
 import { DuplicateWeekCommand } from 'src/shift/applications/use-cases/commands/duplicate-week/duplicate-shift.command';
 import { DuplicateWeekHandler } from 'src/shift/applications/use-cases/commands/duplicate-week/duplicate-shift.handler';
 import { ShiftsPrismaRepository } from 'src/shift/data-access/adapters/shifts-prisma.repository';
+import { LeaveRequestsPrismaRepository } from 'src/leave-request/data-access/adapters/leave-requests-prisma.repository';
+import { LEAVE_REQUEST_REPOSITORY } from 'src/leave-request/data-access/leave-requests.repository';
 import { SHIFT_REPOSITORY } from 'src/shift/data-access/shifts.repository';
 import { GetShiftsByRestaurantHandler } from '../../use-cases/queries/get-shifts-by-restaurant-id.handler';
 import { GetShiftsByRestaurantQuery } from '../../use-cases/queries/get-shifts-by-restaurant-id.query';
@@ -60,6 +62,10 @@ describe('DuplicateWeekHandler Integration', () => {
         GetShiftsByRestaurantHandler,
         EmployeeService,
         { provide: SHIFT_REPOSITORY, useClass: ShiftsPrismaRepository },
+        {
+          provide: LEAVE_REQUEST_REPOSITORY,
+          useClass: LeaveRequestsPrismaRepository,
+        },
         { provide: EMPLOYEES_REPOSITORY, useClass: EmployeesPrismaRepository },
       ],
     }).compile();
