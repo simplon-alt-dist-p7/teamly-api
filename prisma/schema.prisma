@@ -65,6 +65,7 @@ model LeaveRequest {
   startDate  DateTime
   endDate    DateTime
   status     LeaveStatus @default(PENDING)
+  createdAt  DateTime    @default(now())
 }
 
 model Restaurant {
