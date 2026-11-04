@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   ConflictException,
-  ForbiddenException,
   Inject,
   NotFoundException,
 } from '@nestjs/common';
@@ -21,6 +20,8 @@ import {
 import { InvalidTimeRangeError } from 'src/shift/domain/errors/time-range.errors';
 import { Shift } from 'src/shift/domain/models/shift.entity';
 import { TimeRange } from 'src/shift/domain/value-objects/timeRange';
+import { cleanNote } from 'src/shift/partner-planning';
+import { ensureCanEditShift } from '../ensure-can-edit-shift';
 import { ensureEmployeeNotOnLeave } from '../ensure-employee-not-on-leave';
 import { UpdateShiftCommand } from './update-shift.command';
 
@@ -58,9 +59,12 @@ export class UpdateShiftHandler implements ICommandHandler<
     if (!restaurant) {
       throw new NotFoundException('Restaurant not found');
     }
-    if (restaurant.ownerId !== command.ownerId) {
-      throw new ForbiddenException('You are not the owner of this restaurant');
-    }
+    await ensureCanEditShift(
+      restaurant,
+      employee,
+      command.ownerId,
+      this.employeesRepository,
+    );
 
     let timeRange: TimeRange;
     try {
@@ -82,7 +86,10 @@ export class UpdateShiftHandler implements ICommandHandler<
       this.leaveRequestsRepository,
     );
 
-    const updatedShift = shift.cloneWithNewTimeRange(timeRange);
+    // Without a note in the request, the shift keeps its note.
+    const note =
+      command.note === undefined ? shift.note : cleanNote(command.note);
+    const updatedShift = shift.cloneWithNewTimeRange(timeRange, note);
 
     const existing = await this.shiftsRepository.findByEmployeeId(
       shift.employeeId,
