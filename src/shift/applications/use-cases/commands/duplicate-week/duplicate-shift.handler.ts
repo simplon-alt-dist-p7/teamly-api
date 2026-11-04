@@ -63,6 +63,7 @@ export class DuplicateWeekHandler implements ICommandHandler<
             addDays(shift.startTime, 7),
             addDays(shift.endTime, 7),
             command.props.ownerId,
+            shift.note ?? undefined,
           ),
         );
       } catch (error) {

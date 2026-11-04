@@ -4,5 +4,6 @@ export class CreateShiftCommand {
     public readonly startTime: Date,
     public readonly endTime: Date,
     public readonly ownerId: string,
+    public readonly note?: string,
   ) {}
 }
