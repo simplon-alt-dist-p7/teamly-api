@@ -34,6 +34,7 @@ export class ShiftController {
         new Date(dto.startTime),
         new Date(dto.endTime),
         req.user.sub,
+        dto.note,
       ),
     );
   }
@@ -51,6 +52,7 @@ export class ShiftController {
         new Date(dto.startTime),
         new Date(dto.endTime),
         req.user.sub,
+        dto.note,
       ),
     );
   }

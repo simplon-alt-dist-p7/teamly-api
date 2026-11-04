@@ -1,4 +1,10 @@
-import { IsDateString, IsNotEmpty } from 'class-validator';
+import {
+  IsDateString,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export class UpdateShiftDto {
   @IsNotEmpty()
@@ -8,4 +14,9 @@ export class UpdateShiftDto {
   @IsNotEmpty()
   @IsDateString()
   readonly endTime: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(300)
+  readonly note?: string;
 }

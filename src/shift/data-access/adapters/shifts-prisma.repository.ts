@@ -29,6 +29,7 @@ export class ShiftsPrismaRepository implements ShiftRepository {
       data: {
         startTime: shift.startTime,
         endTime: shift.endTime,
+        note: shift.note,
       },
     });
     return this.toDomain(updated);
@@ -41,6 +42,7 @@ export class ShiftsPrismaRepository implements ShiftRepository {
         employeeId: shift.employeeId,
         startTime: shift.startTime,
         endTime: shift.endTime,
+        note: shift.note,
       },
     });
 
@@ -72,6 +74,7 @@ export class ShiftsPrismaRepository implements ShiftRepository {
     employeeId: string;
     startTime: Date;
     endTime: Date;
+    note: string | null;
   }): Shift {
     return new Shift({
       id: row.id,
@@ -80,6 +83,7 @@ export class ShiftsPrismaRepository implements ShiftRepository {
         startTime: row.startTime,
         endTime: row.endTime,
       }),
+      note: row.note,
     });
   }
 }

@@ -9,6 +9,7 @@ import { DeleteShiftHandler } from './applications/use-cases/commands/delete-shi
 import { DuplicateWeekHandler } from './applications/use-cases/commands/duplicate-week/duplicate-shift.handler';
 import { UpdateShiftHandler } from './applications/use-cases/commands/update-shift/update-shift.handler';
 import { GetMyShiftsHandler } from './applications/use-cases/queries/get-my-shifts.handler';
+import { GetPartnerPlanningHandler } from './applications/use-cases/queries/get-partner-planning.handler';
 import { GetShiftsByRestaurantHandler } from './applications/use-cases/queries/get-shifts-by-restaurant-id.handler';
 import { ShiftsPrismaRepository } from './data-access/adapters/shifts-prisma.repository';
 import { SHIFT_REPOSITORY } from './data-access/shifts.repository';
@@ -31,6 +32,7 @@ import { ShiftService } from './shift.service';
     CreateShiftHandler,
     GetShiftsByRestaurantHandler,
     GetMyShiftsHandler,
+    GetPartnerPlanningHandler,
     DuplicateWeekHandler,
     UpdateShiftHandler,
     DeleteShiftHandler,
